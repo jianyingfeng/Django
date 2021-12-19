@@ -83,5 +83,3 @@ class ProjectsView(View):
 
     def delete(self, request):
         return HttpResponse('<h1>删除项目信息</h1>')
-
-    print('11')
