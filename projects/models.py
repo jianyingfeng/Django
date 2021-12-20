@@ -28,3 +28,6 @@ class Projects(models.Model):
     class Meta:
         #i、db_table指定创建的数据表名称
         db_table = 'tb_projects'
+        # i、verbose_name，verbose_name_plural（复数）指定表名称
+        verbose_name = '项目表'
+        verbose_name_plural = '项目表'
