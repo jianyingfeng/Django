@@ -1,8 +1,9 @@
 from django.db import models
+from utils.basemodel import BaseModel
 
 
-class Interfaces(models.Model):
-    id = models.IntegerField(primary_key=True, verbose_name='主键', help_text='主键')
+class Interfaces(BaseModel):
+    # id = models.IntegerField(primary_key=True, verbose_name='主键', help_text='主键')
     name = models.CharField(verbose_name='接口名称', help_text='接口名称', max_length=50)
     tester = models.CharField(verbose_name='测试人员', help_text='测试人员', max_length=10)
     # a、如果需要创建一对多的外键，那么会在”多“的那一个模型类中定义外键字段
@@ -18,10 +19,16 @@ class Interfaces(models.Model):
     # PROTECT：当父表数据删除时，如果有对应的从表数据，则会抛出异常
     # SET_DEFAULT:当父表数据删除时，相对应的从表数据会被自动设置为默认值，还需要额外指定default=True
     projects = models.ForeignKey('projects.Projects', on_delete=models.CASCADE, verbose_name='所属项目', help_text='所属项目')
-    create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间', help_text='创建时间')
-    update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间', help_text='更新时间')
+    # create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间', help_text='创建时间')
+    # update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间', help_text='更新时间')
 
     class Meta:
         db_table = 'tb_interfaces'
         verbose_name = '接口表'
         verbose_name_plural = '接口表'
+        # 按id升序排列
+        ordering = ['id']
+
+    # 打印类时调用此方法
+    def __str__(self):
+        return f'Interfaces({self.name})'
