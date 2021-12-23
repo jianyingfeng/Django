@@ -76,7 +76,35 @@ class ProjectsView(View):
         # c、匹配的记录数大于1，也会抛出异常
         # d、这种查询方式适用于查询条件为唯一约束
         # e、匹配到了唯一一条记录，可以使用模型对象.字段名去获取字段值
-        qs = Projects.objects.get(name='你叉叉项目')
+        # qs = Projects.objects.get(name='你叉叉项目')
+        # pass
+
+        # 2、读单条数据
+        # 方式一：
+        # a、可以使用模型类.objects.filter(条件1=值1)，返回QuerySet对象
+        # b、匹配的记录数为0，会返回空的QuerySet对象
+        # c、匹配的记录数大于1，会返回有值的QuerySet对象
+        # d、QuerySet对象，类似于列表，有如下特性：
+        # 1）支持通过0和正索引取值
+        # 2）不支持负数索引取值
+        # 3）QuerySet对象.first()取第一个值
+        # 4）QuerySet对象.last()取最后一个值
+        # 5）len(QuerySet对象)  或者  QuerySet对象.count()获取长度
+        # 6）QuerySet对象.exists()判断对象是否为空
+        # 7）支持for循环
+        # qs = Projects.objects.filter(id=1)
+        # e、ORM框架会给每张表的主键指定一个别名，pk
+        # qs = Projects.objects.filter(pk=1)
+        qs = Projects.objects.filter(id__gt=1)
+        # filter方法查询：
+        # 1）字段名__exact=具体值，等价于字段名=具体值
+        # 2）字段名__gt=具体值，大于、字段名__gte=具体值，大于等于
+        # 3）字段名__lt=具体值，小于、字段名__lte=具体值，小于等于
+        # 4）contains：包含
+        # 5）startswith：以xxx开头，istartswith：忽略大小写
+        # 6）endswith：以xxx结尾，iendswith：忽略大小写
+        # 7）isnull：是否为null
+        # 8）in：在什么中，可接列表
         pass
         # return JsonResponse(projects_data_list, json_dumps_params={'ensure_ascii': False}, safe=False)
 

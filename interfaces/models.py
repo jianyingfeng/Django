@@ -18,6 +18,7 @@ class Interfaces(BaseModel):
     # SET_NULL：当父表数据删除时，相对应的从表数据会被自动设置为null值
     # PROTECT：当父表数据删除时，如果有对应的从表数据，则会抛出异常
     # SET_DEFAULT:当父表数据删除时，相对应的从表数据会被自动设置为默认值，还需要额外指定default=True
+    # 如果第一个参数，填self，则为自关联，eg：评论与子评论
     projects = models.ForeignKey('projects.Projects', on_delete=models.CASCADE, verbose_name='所属项目', help_text='所属项目')
     # create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间', help_text='创建时间')
     # update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间', help_text='更新时间')

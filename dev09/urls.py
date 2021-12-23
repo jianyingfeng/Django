@@ -23,5 +23,6 @@ urlpatterns = [
     # path('project/index/', views.index),
     # path('project/', include('projects.urls')),
     # path('project/<int:pk>',views.get_project_by_id),
-    path('', include('projects.urls'))
+    path('', include('projects.urls')),
+    path('', include('interfaces.urls'))
 ]
