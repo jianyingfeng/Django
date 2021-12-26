@@ -4,6 +4,7 @@ from projects.models import Projects
 from django.http import HttpResponse
 from django.views import View
 from django.db import connection
+from django.db.models import Q, Count, Avg, Max, Min
 
 
 class InterfacesView(View):
@@ -28,6 +29,49 @@ class InterfacesView(View):
         # 方式二：
         # 从父表查到字表
         # Projects.objects.filter(leader__contains='热水').first().interfaces_set.all()
+
+        # 注：get()返回的是模型对象（即一条数据），filter()返回的是QuerSet对象（即数据集）
+        # 关联查询：
+        # 根据父表参数查询子表数据
+        # Interfaces.objects.filter(projects__name__contains='在线')
+        # 根据字表参数查询父表数据
+        # Projects.objects.filter(interfaces__name__contains='登录')
+
+        # 且查询、或查询：
+        # Projects.objects.filter(name__contains='叉叉', leader__contains='水')
+        # Projects.objects.filter(name__contains='叉叉').filter(leader__contains='水')
+        # Projects.objects.filter(Q(name__contains='叉叉') | Q(leader__contains='水'))
+        # Projects.objects.filter(Q(name__contains='叉叉') & Q(leader__contains='水'))
+
+        # 排序
+        # 字段名前加“-”代表降序排列，下面不是先按id降序排，再按name升序排
+        # Projects.objects.all().order_by('-id', 'name')
+
+        # 更新
+        # 单条更新
+        # projects_obj = Projects.objects.get(id=5)
+        # projects_obj.name = '诺克萨斯项目xxx'
+        # projects_obj.desc = '春江水'
+        # 全量更新，未指导的字段也会更新
+        # projects_obj.save()
+        # 仅更新指定的字段值
+        # projects_obj.save(update_fields=['name','desc'])
+        # 批量更新
+        # Projects.objects.filter(name__contains='叉叉').update(leader='憨xx批',desc='莫得感情')
+
+        # 删除：
+        # 单条删除：
+        # Projects.objects.get(id=5).delete()
+        # 批量删除：
+        # Projects.objects.filter(name__contains='2').delete()
+
+        # 单表写聚合函数：
+        # 直接调用aggregate函数，传入聚合函数，参数传要计算的字段值
+        # qs = Projects.objects.filter(name__contains='项目').aggregate(Count('id'))
+
+        # 多表分组查询：
+        # 前面写主表字段，聚合函数里接字表模型类名小写
+        # qs = Projects.objects.values('id').annotate(Count('interfaces'))
         pass
 
     def post(self, request, pk):
