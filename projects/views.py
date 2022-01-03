@@ -1,49 +1,11 @@
-from django.shortcuts import render
+import json
+
+from django.db import connection
 from django.http import HttpResponse, JsonResponse
 from django.views import View
-import json
+
 from .models import Projects
-from django.db import connection
-
-
-# def index(request):
-#     return HttpResponse('欢迎来到德莱联盟！')
-#
-#
-# def create_project(request):
-#     return HttpResponse('创建项目信息')
-#
-#
-# def put_project(request):
-#     return HttpResponse('更新项目信息')
-#
-#
-# def get_project(request):
-#     return HttpResponse('获取项目信息')
-#
-#
-# def delete_project(request):
-#     return HttpResponse('删除项目信息')
-#
-#
-# def get_project_by_id(request, pk):
-#     return HttpResponse(f'这是项目{pk}的信息')
-
-
-# def projects(request):
-#     # print(request)
-#     # print(type(request))
-#     # print(type(request).__mro__)
-#     if request.method == 'GET':
-#         return HttpResponse('<h1>获取项目信息</h1>')
-#     elif request.method == 'POST':
-#         return HttpResponse('<h1>新增项目信息</h1>')
-#     elif request.method == 'PUT':
-#         return HttpResponse('<h1>修改项目信息</h1>')
-#     elif request.method == 'DELETE':
-#         return HttpResponse('<h1>删除项目信息</h1>')
-#     else:
-#         return HttpResponse('<h1>其他操作</h1>')
+from .serializers import ProjectSerializers
 
 
 # class ProjectsView(View):
@@ -120,21 +82,13 @@ class ProjectsView(View):
     def get(self, request):
         # a、获取所有项目的查询集
         queryset = Projects.objects.all()
-        # b、定义空列表
-        projects_list = []
-        # c、将查询集对象遍历出来放进空列表
-        for item in queryset:
-            item: Projects
-            projects_list.append(
-                {
-                    'id': item.id,
-                    'name': item.name,
-                    'leader': item.leader
-                }
-            )
-        # c、返回数据
+        # b、返回数据
         # safe=False，当传入参数不为字典类型时，依旧可以转换为json对象
-        return JsonResponse(projects_list, safe=False)
+        # 序列化对象，当传入的是列表时，设置many=True
+        # 序列化对象，传字典时不需要many参数，传列表时需要many=True
+        p_ser = ProjectSerializers(instance=queryset, many=True)
+        # 通过.data属性，将数据返回
+        return JsonResponse(p_ser.data, safe=False)
 
     # 需求：创建一条数据
     def post(self, request):
@@ -143,53 +97,17 @@ class ProjectsView(View):
             python_data = json.loads(request.body)
         except:
             return JsonResponse({'msg': '参数格式有误'}, status=400)
-        try:
-            python_data.get('name')
-        except:
-            return JsonResponse({'msg': '缺少name参数'}, status=400)
-        try:
-            python_data.get('leader')
-        except:
-            return JsonResponse({'msg': '缺少leader参数'}, status=400)
-        try:
-            python_data.get('is_execute')
-        except:
-            return JsonResponse({'msg': '缺少is_execute参数'}, status=400)
-        # 校验name字段类型
-        if isinstance(python_data.get('name'), str):
-            # 校验name字段类型长度
-            if len(python_data.get('name')) <= 20:
-                # 校验leader字段类型
-                if isinstance(python_data.get('leader'), str):
-                    # 校验leader字段类型长度
-                    if len(python_data.get('leader')) <= 10:
-                        # 校验is_execute字段类型
-                        if isinstance(python_data.get('is_execute'), bool):
-                            # 校验desc字段类型
-                            if isinstance(python_data.get('desc'), str):
-                                # 将请求参数写入到obj类中
-                                obj = Projects.objects.create(name=python_data.get('name'),
-                                                              leader=python_data.get('leader'),
-                                                              is_execute=python_data.get('is_execute'),
-                                                              desc=python_data.get('desc'))
-                                # 返回刚刚创建好的这条数据
-                                return JsonResponse({
-                                    'name': obj.name,
-                                    'leader': obj.leader,
-                                    'msg': '创建成功'
-                                })
-                            else:
-                                return JsonResponse({'msg': 'desc参数格式错误'}, status=400)
-                        else:
-                            return JsonResponse({'msg': 'is_execute参数格式错误'}, status=400)
-                    else:
-                        return JsonResponse({'msg': 'leader参数超出长度'}, status=400)
-                else:
-                    return JsonResponse({'msg': 'leader参数格式错误'}, status=400)
-            else:
-                return JsonResponse({'msg': 'name参数超出长度'}, status=400)
-        else:
-            return JsonResponse({'msg': 'name参数格式错误'}, status=400)
+        # 反序列化操作
+        # 通过给序列化类的data参数传参，调用is_valid()方法来对数据进行校验，通过返回True，不通过则返回False
+        # 调用.errors可以返回校验未通过的提示信息，也可以通过is_valid(raise_exception=True)直接返回
+        # 调用.validated_data可以返回校验通过的数据，与json.loads()转换的参数不一定一样
+        revers_ser = ProjectSerializers(data=python_data)
+        if not revers_ser.is_valid():
+            return JsonResponse(revers_ser.errors, status=400)
+        obj = Projects.objects.create(**revers_ser.validated_data)
+        p_ser = ProjectSerializers(obj)
+        # 返回刚刚创建好的这条数据
+        return JsonResponse(p_ser.data)
 
 
 class ProjectsDetailView(View):
@@ -197,45 +115,32 @@ class ProjectsDetailView(View):
     def get(self, request, pk):
         # 1、先校验数据是否存在
         # 略
-        # 2、从数据中获取项目数据
+        # 2、从数据库中获取项目数据
         try:
             item = Projects.objects.get(id=pk)
         except:
             return JsonResponse({'msg': '参数格式有误'}, status=400)
-        python_data = {
-            'data': {
-                'id': item.id,
-                'name': item.name,
-                'leader': item.leader
-            },
-            'msg': '获取成功'
-        }
+        p_ser = ProjectSerializers(item)
         # 3、返回数据
-        return JsonResponse(python_data)
+        return JsonResponse(p_ser.data)
 
     # 更新项目信息
     def put(self, request, pk):
         # rs = request
         # pass
         python_data = json.loads(request.body)
-
         try:
             obj = Projects.objects.get(id=pk)
         except:
             return JsonResponse('参数格式有误', status=400, safe=False)
-
-        obj.name = python_data.get('name')
-        obj.leader = python_data.get('leader')
+        reverse_ser = ProjectSerializers(data=python_data)
+        if not reverse_ser.is_valid():
+            return reverse_ser.errors
+        obj.name = reverse_ser.validated_data.get('name')
+        obj.leader = reverse_ser.validated_data.get('leader')
         obj.save(update_fields=['name', 'leader'])
-        res_data = {
-            'data': {
-                'id': obj.id,
-                'name': obj.name,
-                'leader': obj.leader
-            },
-            'msg': '更新成功'
-        }
-        return JsonResponse(res_data)
+        p_ser = ProjectSerializers(obj)
+        return JsonResponse(p_ser.data)
 
     # 删除项目
     def delete(self, request, pk):

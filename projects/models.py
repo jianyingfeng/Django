@@ -11,7 +11,7 @@ class Animal(models.Model):
 class Projects(BaseModel):
     # primary_key指定后，创建的数据表就不会自动生成一个id字段（一张表只会有一个主键id）
     # ids = models.IntegerField(primary_key=True, verbose_name='项目主键', help_text='项目主键')
-    #a、CharField类型必须指定max_length参数（该字段的最大字节数）
+    #a、CharField类型必须指定max_length参数（该字段的最大字节数），不传则存“”
     #b、unique=True（默认为False）可以给字段添加唯一约束
     name = models.CharField(max_length=20, verbose_name='项目名称', help_text='项目名称', unique=True)
     leader = models.CharField(max_length=10, verbose_name='项目名称', help_text='项目名称')
