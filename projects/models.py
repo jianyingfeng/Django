@@ -14,16 +14,16 @@ class Projects(BaseModel):
     #a、CharField类型必须指定max_length参数（该字段的最大字节数），不传则存“”
     #b、unique=True（默认为False）可以给字段添加唯一约束
     name = models.CharField(max_length=20, verbose_name='项目名称', help_text='项目名称', unique=True)
-    leader = models.CharField(max_length=10, verbose_name='项目名称', help_text='项目名称')
+    leader = models.CharField(max_length=10, verbose_name='项目负责人', help_text='项目负责人')
     #c、使用default指定默认值（如果前端在创建记录时，未传递该字段，则使用默认值）
     is_execute = models.BooleanField(default=True, verbose_name='项目是否启动（默认为启动）', help_text='项目是否启动（默认为启动）')
     #d、null=True指定前端创建数据时，可以指定该字段为null，默认null=False,DRF进行反序列化器输入时才有效
-    #e、blank=True指定前端创建数据时，可以指定该字段为null，默认blank=False,DRF进行反序列化器输入时才有效
+    #e、blank=True指定前端创建数据时，可以指定该字段为''，默认blank=False,DRF进行反序列化器输入时才有效
     desc = models.TextField(verbose_name='项目描述', help_text='项目描述', null=True, blank=True, default='')
     #f、auto_now_add=True（默认为false），在创建记录时，会把当前时间赋值给该字段
     #g、auto_now=True（默认为false），在更新记录时，会把当前时间赋值给该字段
-    # create_time = models.DateTimeField(auto_now_add=True)
-    # update_time = models.DateTimeField(auto_now=True)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
 
 
