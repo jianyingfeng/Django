@@ -54,7 +54,7 @@ from projects.models import Projects
 #         # projects_obj = Projects.objects.get(id=5)
 #         # projects_obj.name = '诺克萨斯项目xxx'
 #         # projects_obj.desc = '春江水'
-#         # 全量更新，未指导的字段也会更新
+#         # 全量更新，未指定的字段也会更新（更新时间字段也会被更新）
 #         # projects_obj.save()
 #         # 仅更新指定的字段值
 #         # projects_obj.save(update_fields=['name','desc'])

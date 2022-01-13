@@ -3,7 +3,7 @@ from django.db import models
 
 # 公共类（存储公共字段）
 class BaseModel(models.Model):
-    id = models.IntegerField(primary_key=True, verbose_name='主键', help_text='主键')
+    # id = models.IntegerField(primary_key=True, verbose_name='主键', help_text='主键')
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间', help_text='创建时间')
     update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间', help_text='更新时间')
 

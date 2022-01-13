@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from interfaces.models import Interfaces
 from .models import Projects
 
 # 序列化类：
@@ -44,11 +43,17 @@ class ProjectSerializers(serializers.Serializer):
     # UniqueValidator校验器需要指定querset对数据进行校验，并通锅message指定报错信息
     # 校验的顺序：
     #   1、校验字段类型--》2、从左到右校验validators里面的规则--》3、从右到左校验其他规则（就算某项不通过也会一直校验下去）--》4、单个字段校验--》5、联合字段校验
+    #   前3步一定会校验完成，只有前3步校验失败时，不会走到第4步
     name = serializers.CharField(label='项目名称', help_text='项目名称', min_length=5, max_length=20,
                                  error_messages={'min_length':'最少为5位', 'max_length':'最长为20位', 'required':'该字段必填'},
                                  validators=[UniqueValidator(queryset=Projects.objects.all(), message='项目名称已存在'),
                                              is_contains])
-    leader = serializers.CharField(label='项目负责人', help_text='项目负责人', default='mm')
+    leader = serializers.CharField(label='项目负责人', help_text='项目负责人', required=False)
+    is_execute = serializers.BooleanField(label='是否执行', help_text='是否执行', default=True, write_only=True)
+    # 1、如果定义了一个模型类没有的字段，且需要输出，则可以在create、update方法中的模型类中添加动态属性来实现
+    # 2、如果定义了一个模型类没有的字段，且需要输入，则可以在create、update方法中将该字段pop掉
+    token = serializers.CharField(label='token', help_text='token', read_only=True)
+    sms_code = serializers.CharField(label='短信验证码', help_text='短信验证码', write_only=True)
     # 关联字段
     # 可以直接定义PrimaryKeyRelatedField来获取关联表的外键值
     # 字段名称默认为关联表模型类名称小写_set,关联模型类中的关联字段指定了related_name参数，则字段名使用这个
@@ -85,7 +90,90 @@ class ProjectSerializers(serializers.Serializer):
     # 联合字段校验
     # 方法名称必须为validate，attrs是个字典，
     # 最后必须返回
-    def validate(self, attrs:dict):
-        if not (len(attrs.get('leader'))>=4 and attrs.get('is_execute') == True):
-            raise serializers.ValidationError('项目负责人长度小于4位或is_execute不为True')
-        return attrs
+    # def validate(self, attrs:dict):
+    #     if not (len(attrs.get('leader'))>=4 and attrs.get('is_execute') == True):
+    #         raise serializers.ValidationError('项目负责人长度小于4位或is_execute不为True')
+    #     return attrs
+
+    def create(self, validated_data:dict):
+        validated_data.pop('my_name')
+        validated_data.pop('my_age')
+        validated_data.pop('sms_code')
+        project_obj = Projects.objects.create(**validated_data)
+        project_obj.token = 'kks$$%$%$%454ja'
+        return project_obj
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name')
+        instance.leader = validated_data.get('leader')
+        return instance
+
+    # 1、to_internal_value方法，会在单个字段的每个校验条件之前调用
+    # 2、会依次对序列化器类的各个序列化器字段进行校验
+    # 校验的顺序：
+    #     #   1、校验字段类型--》2、从左到右校验validators里面的规则--》3、从右到左校验其他规则（就算某项不通过也会一直校验下去）--》4、单个字段校验--》
+    #     至此to_internal_value方法结束--》5、联合字段校验
+    def to_internal_value(self, data):
+        tmp = super().to_internal_value(data)
+        # 因此可以在to_internal_value方法调用结束后对数据进行修改
+        return tmp
+
+
+# 模型序列化器类的作用：
+# 1、自动生成序列化字段
+# 2、自动创建create、update方法
+
+# 1、需要继承ModelSerializer，并且写一个Meta内部类，需要指定model、fields参数
+# 2、model字段指定绑定的模型类，fields指定需要序列化的字段
+# 3、会给主键字段、指定了auto_now、auto_add_now的字段添加read_only=True
+# 4、会给指定了unique=True的字段在validators列表中添加UniqueValidator约束
+# 5、会给指定了default=True的字段添加required=False
+# 6、会给指定了blank=True的字段添加allow_blank=True
+# 7、会给指定了null=True的字段添加allow_null=True
+class ProjectModelSerializers(serializers.ModelSerializer):
+    """
+    1、在模型序列化器类可以自定义序列化字段，优先级高于Meta类
+    2、此处定义的字段一定得包含在fields参数中
+    """
+    name = serializers.CharField(label='项目名称', help_text='项目名称', min_length=5, max_length=20,
+                                 error_messages={'min_length': '最少为5位', 'max_length': '最长为20位', 'required': '该字段必填'},
+                                 validators=[UniqueValidator(queryset=Projects.objects.all(), message='项目名称已存在'),
+                                             is_contains])
+    interfaces_set = serializers.PrimaryKeyRelatedField(label='项目附属接口id', help_text='项目附属接口id',many=True, read_only=True)
+    token = serializers.CharField(label='token', help_text='token', read_only=True)
+
+    class Meta():
+        model = Projects
+        # fields指定需要序列化的字段
+        # 1、fields指定'__all__'时，则会对所有字段进行序列化
+        # 2、fields指定元组时，则仅对元组中的字段进行序列化
+        # 3、当定义了模型类中不存在的字段时，需要添加到fields元组中
+        fields = '__all__'
+        # fields = ('name','leader', 'is_execute')
+
+        # exclude指定元组时，则不会对元组中的字段进行序列化
+        # exclude = ('create_time', 'update_time')
+
+        # Meta类中的extra_kwargs字典可以对自动生成的序列化字段进行微调，不是自动化生成的则不支持
+        extra_kwargs = {
+            'leader':{
+                'min_length':5,
+                'error_messages':{
+                    'min_length':'最少为5位'
+                }
+            },
+            'is_execute':{
+                'required':True
+            }
+        }
+        # 批量指定只读字段
+        # read_only_fields = ['id', 'is_execute']
+
+    # 通过重写父类的create方法可以对模型类中不存在的字段进行处理
+    # 最后需要调用父类的create方法
+    def create(self, validated_data:dict):
+        validated_data.pop('my_name')
+        validated_data.pop('my_age')
+        project_obj = super().create(validated_data)
+        project_obj.token = 'sasdsa$%$$5wew'
+        return project_obj

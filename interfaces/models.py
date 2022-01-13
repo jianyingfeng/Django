@@ -3,7 +3,6 @@ from utils.basemodel import BaseModel
 
 
 class Interfaces(BaseModel):
-    # id = models.IntegerField(primary_key=True, verbose_name='主键', help_text='主键')
     name = models.CharField(verbose_name='接口名称', help_text='接口名称', max_length=50)
     tester = models.CharField(verbose_name='测试人员', help_text='测试人员', max_length=10)
     # a、如果需要创建一对多的外键，那么会在”多“的那一个模型类中定义外键字段
@@ -21,8 +20,6 @@ class Interfaces(BaseModel):
     # 如果第一个参数，填self，则为自关联，eg：评论与子评论
     projects = models.ForeignKey('projects.Projects', on_delete=models.CASCADE, verbose_name='所属项目',
                                  help_text='所属项目')
-    # create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间', help_text='创建时间')
-    # update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间', help_text='更新时间')
 
     class Meta:
         db_table = 'tb_interfaces'
