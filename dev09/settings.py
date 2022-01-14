@@ -127,3 +127,25 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# DRF中的解析器（类）
+# 1、可以根据请求头中的Content-Type来自动解析参数，使用统一的data属性来获取即可
+# 2、默认JSONParser、FormParser、MultiPartParser三个解析器类
+# 3、可以在全局配置文件（settings.py）中修改DRF全局参数，REST_FRAMEWORK是固定写法
+REST_FRAMEWORK = {
+    'DEFAULT_PARSER_CLASSES': [
+            'rest_framework.parsers.JSONParser',
+            'rest_framework.parsers.FormParser',
+            'rest_framework.parsers.MultiPartParser'
+        ],
+    # DRF中的渲染器
+    # 1、可以根据请求头中的Accept参数来自动渲染前端需要的数据格式
+    # 2、默认的渲染器为JSONRenderer、BrowsableAPIRenderer
+    # 3、如果前端请求头未指定Accept参数或者指定为application/json，那么会自动返回json格式的数据
+    # 4、如果前端请求头指定Accept参数为text/html，那么会返回html页面
+    # 5、可以在DEFAULT_RENDERER_CLASSES中指定需要使用的渲染器
+    'DEFAULT_RENDERER_CLASSES': [
+            'rest_framework.renderers.JSONRenderer',
+            'rest_framework.renderers.BrowsableAPIRenderer',
+        ],
+}

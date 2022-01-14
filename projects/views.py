@@ -4,6 +4,7 @@ from django.db import connection
 from django.http import HttpResponse, JsonResponse
 from django.views import View
 from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from .models import Projects
 from .serializers import ProjectSerializers, ProjectModelSerializers
@@ -81,25 +82,28 @@ class ProjectsView(APIView):
         # 序列化对象，传字典时不需要many参数，传列表时需要many=True
         serializer = ProjectSerializers(instance=queryset, many=True)
         # 通过.data属性，将数据返回
-        return JsonResponse(serializer.data, safe=False)
+        # return JsonResponse(serializer.data, safe=True)
+        # 在DRF中Response为HTTPResponse的子类
+        # a、会自动根据渲染器来将数据转换为请求头中Accept需要的格式进行返回
+        return Response(serializer.data)
 
     # 需求：创建一条数据
     def post(self, request):
-        # a、继承APIView之后，request是DRF中Request对象
-        # b、可以使用.get、.query_params获取url中查询参数
-        # c、对于前端传递的application/json、application/x-www-form-urlencoded、form-data参数，都可以使用.data来获取
         # 先获取到请求体中的参数
-        try:
-            python_data = json.loads(request.body)
-        except:
-            return JsonResponse({'msg': '参数格式有误'}, status=400)
+        # try:
+        #     python_data = json.loads(request.body)
+        # except:
+        #     return JsonResponse({'msg': '参数格式有误'}, status=400)
         # 反序列化操作
         # 通过给序列化类的data参数传参，调用is_valid()方法来对数据进行校验，通过返回True，不通过则返回False
         # 调用.errors可以返回校验未通过的提示信息，也可以通过is_valid(raise_exception=True)直接返回
         # 调用.validated_data可以返回校验通过的数据，与json.loads()转换的参数不一定一样
-        serializer = ProjectModelSerializers(data=python_data)
-        if not serializer.is_valid():
-            return JsonResponse(serializer.errors, status=400)
+
+        # a、继承APIView之后，request是DRF中Request对象
+        # b、可以使用.get、.query_params获取url中查询参数
+        # c、对于前端传递的application/json、application/x-www-form-urlencoded、form-data参数，都可以使用.data来获取
+        serializer = ProjectModelSerializers(data=request.data)
+        serializer.is_valid(raise_exception=True)
         # obj = Projects.objects.create(**revers_ser.validated_data)
         # 1、在创建序列化对象的时候，仅传递了data参数，可以调用save方法，即会调用序列化类中的create方法
         # 2、create方法中的validated_data为校验通过的参数（一般为字典）
@@ -112,36 +116,40 @@ class ProjectsView(APIView):
         # 1、可以使用创建序列化器对象.data属性，来获取序列化输出的数据，需要在is_valid方法之后使用
         # 2、如果没有调用save方法，会把validated_data当做输入源，参照序列化类的序列化字段来进行输出
         # 3、如果调用了save方法，则会将create方法返回的模型对象当做输入源，参照序列化类的序列化字段来进行输出
-        return JsonResponse(serializer.data, safe=False)
+        # return JsonResponse(serializer.data, safe=False)
+        return Response(serializer.data, safe=False)
 
 
-class ProjectsDetailView(View):
+class ProjectsDetailView(APIView):
+    # 查询单条项目数据的方法
+    def get_object(self, id):
+        try:
+            project_obj = Projects.objects.get(id=id)
+            return project_obj
+        except:
+            return Response({'msg': '参数格式有误'}, status=400)
+
     # 需求：查询单条项目数据
     def get(self, request, pk):
         # 1、先校验数据是否存在
         # 略
         # 2、从数据库中获取项目数据
-        try:
-            project_obj = Projects.objects.get(id=pk)
-        except:
-            return JsonResponse({'msg': '参数格式有误'}, status=400)
+        # try:
+        #     project_obj = Projects.objects.get(id=pk)
+        # except:
+        #     return Response({'msg': '参数格式有误'}, status=400)
+        # 查询单条项目数据
+        project_obj = self.get_object(pk)
         serializer = ProjectSerializers(project_obj)
         # 3、返回数据
-        return JsonResponse(serializer.data)
+        return Response(serializer.data)
 
     # 更新项目信息
     def put(self, request, pk):
-        try:
-            project_obj = Projects.objects.get(id=pk)
-        except:
-            return JsonResponse('项目不存在', status=400, safe=False)
-        try:
-            python_data = json.loads(request.body)
-        except:
-            return JsonResponse('参数格式有误', status=400, safe=False)
-        serializer = ProjectSerializers(instance=project_obj, data=python_data)
-        if not serializer.is_valid():
-            return JsonResponse(serializer.errors, status=400)
+        # 查询单条项目数据
+        project_obj = self.get_object(pk)
+        serializer = ProjectSerializers(instance=project_obj, data=request.data)
+        serializer.is_valid(raise_exception=True)
         # project_obj.name = serializer.validated_data.get('name')
         # project_obj.leader = serializer.validated_data.get('leader')
         # project_obj.save(update_fields=['name', 'leader'])
@@ -153,14 +161,14 @@ class ProjectsDetailView(View):
         # p_ser = ProjectSerializers(instance=obj)
         # 将数据返回
         # return JsonResponse(p_ser.data)
-        return JsonResponse(serializer.data)
+        return Response(serializer.data)
 
     # 删除项目
     def delete(self, request, pk):
         try:
             Projects.objects.get(id=pk).delete()
         except:
-            return JsonResponse('参数格式有误', status=400, safe=False)
-        return JsonResponse({
+            return Response('参数格式有误', status=400, safe=False)
+        return Response({
             'msg': '删除成功！'
         })
