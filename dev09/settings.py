@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = 'django-insecure-wssq5_!t!(mel9kfmsa4q1n6n0&r%%l_0sd+2r=1o3)=xd6m3f
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -73,7 +71,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'dev09.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -83,7 +80,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -103,7 +99,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -116,7 +111,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
@@ -134,10 +128,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # 3、可以在全局配置文件（settings.py）中修改DRF全局参数，REST_FRAMEWORK是固定写法
 REST_FRAMEWORK = {
     'DEFAULT_PARSER_CLASSES': [
-            'rest_framework.parsers.JSONParser',
-            'rest_framework.parsers.FormParser',
-            'rest_framework.parsers.MultiPartParser'
-        ],
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser'
+    ],
     # DRF中的渲染器
     # 1、可以根据请求头中的Accept参数来自动渲染前端需要的数据格式
     # 2、默认的渲染器为JSONRenderer、BrowsableAPIRenderer
@@ -145,7 +139,11 @@ REST_FRAMEWORK = {
     # 4、如果前端请求头指定Accept参数为text/html，那么会返回html页面
     # 5、可以在DEFAULT_RENDERER_CLASSES中指定需要使用的渲染器
     'DEFAULT_RENDERER_CLASSES': [
-            'rest_framework.renderers.JSONRenderer',
-            'rest_framework.renderers.BrowsableAPIRenderer',
-        ],
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+    # 在全局DEFAULT_FILTER_BACKENDS指定过滤用的搜索引擎类（SearchFilter）
+    # SEARCH_PARAM可以自定义搜索参数名称（默认为search）
+    'DEFAULT_FILTER_BACKENDS': ['rest_framework.filters.SearchFilter'],
+    'SEARCH_PARAM': 'se',
 }

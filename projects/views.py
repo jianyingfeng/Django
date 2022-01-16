@@ -4,6 +4,7 @@ from django.db import connection
 from django.http import HttpResponse, JsonResponse
 from django.views import View
 from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
 from .models import Projects
@@ -71,16 +72,44 @@ from .serializers import ProjectSerializers, ProjectModelSerializers
 
 
 # class ProjectsView(View):
-class ProjectsView(APIView):
+# class ProjectsView(APIView):
+class ProjectsView(GenericAPIView):
+    """
+    继承GenericAPIView父类（GenericAPIView子类）
+    a、具备View的所有特性
+    b、具备了APIView的认证、权限、限流功能
+    c、还支持搜索、排序、分页功能
+    """
+    # 一旦继承继承GenericAPIView之后，往往需要指定queryset、serializer_class类属性
+    # queryset指定当前视图类需要使用到的查询集对象
+    # serializer_class指定当前视图类需要使用到的序列化器类
+    queryset = Projects.objects.all()
+    serializer_class = ProjectModelSerializers
+    # 必须继承GenericAPIView类
+    # search_fields指定搜索字段
+    # 为icontains查询
+    # 可以指定如下几种查询方式
+    # '^': 'istartswith',
+    # '=': 'iexact',
+    # '$': 'iregex',
+    search_fields = ['^name', 'leader', 'id']
+
     # APIView是django中View的子类
     # 需求：获取所有项目数据
     def get(self, request):
         # a、获取所有项目的查询集
-        queryset = Projects.objects.all()
+        # 1、在实例方法中，往往使用get_queryset()方法获取查询集对象
+        # 2、一般不会直接调用self.queryset属性，原因：为了提供让用户重写get_queryset()方法
+        # 3.如果未重写get_queryset()方法，则必须指定queryset类属性
+        # queryset = self.get_queryset()
+        queryset = self.filter_queryset(self.get_queryset())
         # b、返回数据
         # safe=False，当传入参数不为字典类型时，依旧可以转换为json对象
         # 序列化对象，传字典时不需要many参数，传列表时需要many=True
-        serializer = ProjectSerializers(instance=queryset, many=True)
+        # 1、在实例方法中，往往使用get_serializer()方法获取序列化器类
+        # 2、一般不会直接调用serializer_class属性，原因：为了提供让用户重写get_serializer_class()方法
+        # 3.如果未重写get_serializer_class()方法，则必须指定serializer_class类属性
+        serializer = self.get_serializer(instance=queryset, many=True)
         # 通过.data属性，将数据返回
         # return JsonResponse(serializer.data, safe=True)
         # 在DRF中Response为HTTPResponse的子类
@@ -102,7 +131,7 @@ class ProjectsView(APIView):
         # a、继承APIView之后，request是DRF中Request对象
         # b、可以使用.get、.query_params获取url中查询参数
         # c、对于前端传递的application/json、application/x-www-form-urlencoded、form-data参数，都可以使用.data来获取
-        serializer = ProjectModelSerializers(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         # obj = Projects.objects.create(**revers_ser.validated_data)
         # 1、在创建序列化对象的时候，仅传递了data参数，可以调用save方法，即会调用序列化类中的create方法
@@ -117,20 +146,19 @@ class ProjectsView(APIView):
         # 2、如果没有调用save方法，会把validated_data当做输入源，参照序列化类的序列化字段来进行输出
         # 3、如果调用了save方法，则会将create方法返回的模型对象当做输入源，参照序列化类的序列化字段来进行输出
         # return JsonResponse(serializer.data, safe=False)
-        return Response(serializer.data, safe=False)
+        return Response(serializer.data)
 
 
-class ProjectsDetailView(APIView):
-    # 查询单条项目数据的方法
-    def get_object(self, id):
-        try:
-            project_obj = Projects.objects.get(id=id)
-            return project_obj
-        except:
-            return Response({'msg': '参数格式有误'}, status=400)
+class ProjectsDetailView(GenericAPIView):
+    queryset = Projects.objects.all()
+    serializer_class = ProjectModelSerializers
+    # lookup_url_kwarg参数默认为None
+    # 如果lookup_url_kwarg为None，则lookup_url_kwarg会取lookup_field的值（即pk）
+    # lookup_url_kwarg也可指定成url配置中的参数名，那么类视图方法中的参数名需要修改为**kwargs
+    # lookup_url_kwarg = 'kk'
 
     # 需求：查询单条项目数据
-    def get(self, request, pk):
+    def get(self, request, **kwargs):
         # 1、先校验数据是否存在
         # 略
         # 2、从数据库中获取项目数据
@@ -139,16 +167,17 @@ class ProjectsDetailView(APIView):
         # except:
         #     return Response({'msg': '参数格式有误'}, status=400)
         # 查询单条项目数据
-        project_obj = self.get_object(pk)
-        serializer = ProjectSerializers(project_obj)
+        # get_object()会获取模型对象，且不需要传递查询参数名
+        project_obj = self.get_object()
+        serializer = self.get_serializer(project_obj)
         # 3、返回数据
         return Response(serializer.data)
 
     # 更新项目信息
     def put(self, request, pk):
         # 查询单条项目数据
-        project_obj = self.get_object(pk)
-        serializer = ProjectSerializers(instance=project_obj, data=request.data)
+        project_obj = self.get_object()
+        serializer = self.get_serializer(instance=project_obj, data=request.data)
         serializer.is_valid(raise_exception=True)
         # project_obj.name = serializer.validated_data.get('name')
         # project_obj.leader = serializer.validated_data.get('leader')
@@ -165,10 +194,8 @@ class ProjectsDetailView(APIView):
 
     # 删除项目
     def delete(self, request, pk):
-        try:
-            Projects.objects.get(id=pk).delete()
-        except:
-            return Response('参数格式有误', status=400, safe=False)
+        project_obj = self.get_object()
+        project_obj.delete()
         return Response({
             'msg': '删除成功！'
         })

@@ -3,6 +3,7 @@ from rest_framework.validators import UniqueValidator
 
 from .models import Projects
 
+
 # 序列化类：
 # DRF中的序列化模块，在子应用下新建该py文件即可
 # 文件名建议命名为serializers.py
@@ -45,7 +46,7 @@ class ProjectSerializers(serializers.Serializer):
     #   1、校验字段类型--》2、从左到右校验validators里面的规则--》3、从右到左校验其他规则（就算某项不通过也会一直校验下去）--》4、单个字段校验--》5、联合字段校验
     #   前3步一定会校验完成，只有前3步校验失败时，不会走到第4步
     name = serializers.CharField(label='项目名称', help_text='项目名称', min_length=5, max_length=20,
-                                 error_messages={'min_length':'最少为5位', 'max_length':'最长为20位', 'required':'该字段必填'},
+                                 error_messages={'min_length': '最少为5位', 'max_length': '最长为20位', 'required': '该字段必填'},
                                  validators=[UniqueValidator(queryset=Projects.objects.all(), message='项目名称已存在'),
                                              is_contains])
     leader = serializers.CharField(label='项目负责人', help_text='项目负责人', required=False)
@@ -73,7 +74,7 @@ class ProjectSerializers(serializers.Serializer):
     # 如果该字段需要输入，则必须指定queryset参数，同时关联参数必须有唯一约束
     # interfaces_set = serializers.SlugRelatedField(slug_field='name', many=True, queryset=Interfaces.objects.all())
 
-    interfaces_set = InterfaceSerializers(label='项目附属接口id', help_text='项目附属接口id', many=True ,required=False)
+    interfaces_set = InterfaceSerializers(label='项目附属接口id', help_text='项目附属接口id', many=True, required=False)
     # format参数可以对时间进行格式化输出
     update_time = serializers.DateTimeField(label='更新时间', help_text='更新时间', format='%Y-%m-%d %H:%M:%S', required=False)
     create_time = serializers.DateTimeField(label='创建时间', help_text='创建时间', format='%Y-%m-%d %H:%M:%S', required=False)
@@ -82,7 +83,7 @@ class ProjectSerializers(serializers.Serializer):
     # 写在序列化类里面的校验方法名称必须为validate_字段名称
     # 且校验通过，必须将字段返回，不返回则会返回None，在写库的时候会报错
     # 只有当序列化类外的校验以及validators的校验通过之后，才会走这个校验
-    def validate_name(self, attr:str):
+    def validate_name(self, attr: str):
         if not attr.endswith('项目'):
             raise serializers.ValidationError('项目名称必须以“项目”结尾')
         return attr
@@ -95,7 +96,7 @@ class ProjectSerializers(serializers.Serializer):
     #         raise serializers.ValidationError('项目负责人长度小于4位或is_execute不为True')
     #     return attrs
 
-    def create(self, validated_data:dict):
+    def create(self, validated_data: dict):
         validated_data.pop('my_name')
         validated_data.pop('my_age')
         validated_data.pop('sms_code')
@@ -139,7 +140,7 @@ class ProjectModelSerializers(serializers.ModelSerializer):
                                  error_messages={'min_length': '最少为5位', 'max_length': '最长为20位', 'required': '该字段必填'},
                                  validators=[UniqueValidator(queryset=Projects.objects.all(), message='项目名称已存在'),
                                              is_contains])
-    interfaces_set = serializers.PrimaryKeyRelatedField(label='项目附属接口id', help_text='项目附属接口id',many=True, read_only=True)
+    interfaces_set = InterfaceSerializers(label='项目附属接口id', help_text='项目附属接口id', many=True, required=False)
     token = serializers.CharField(label='token', help_text='token', read_only=True)
 
     class Meta():
@@ -156,14 +157,20 @@ class ProjectModelSerializers(serializers.ModelSerializer):
 
         # Meta类中的extra_kwargs字典可以对自动生成的序列化字段进行微调，不是自动化生成的则不支持
         extra_kwargs = {
-            'leader':{
-                'min_length':5,
-                'error_messages':{
-                    'min_length':'最少为5位'
+            'leader': {
+                'min_length': 5,
+                'error_messages': {
+                    'min_length': '最少为5位'
                 }
             },
-            'is_execute':{
-                'required':True
+            'is_execute': {
+                'required': True
+            },
+            'create_time': {
+                'format': '%Y-%m-%d %H:%M:%S'
+            },
+            'update_time': {
+                'format': '%Y-%m-%d %H:%M:%S'
             }
         }
         # 批量指定只读字段
@@ -171,7 +178,7 @@ class ProjectModelSerializers(serializers.ModelSerializer):
 
     # 通过重写父类的create方法可以对模型类中不存在的字段进行处理
     # 最后需要调用父类的create方法
-    def create(self, validated_data:dict):
+    def create(self, validated_data: dict):
         validated_data.pop('my_name')
         validated_data.pop('my_age')
         project_obj = super().create(validated_data)
