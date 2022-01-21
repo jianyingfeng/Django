@@ -179,8 +179,17 @@ class ProjectModelSerializers(serializers.ModelSerializer):
     # 通过重写父类的create方法可以对模型类中不存在的字段进行处理
     # 最后需要调用父类的create方法
     def create(self, validated_data: dict):
-        validated_data.pop('my_name')
-        validated_data.pop('my_age')
+        # validated_data.pop('my_name')
+        # validated_data.pop('my_age')
         project_obj = super().create(validated_data)
         project_obj.token = 'sasdsa$%$$5wew'
         return project_obj
+
+
+class ProjectModelSerializers111(serializers.ModelSerializer):
+    """
+    另一个序列化类
+    """
+    class Meta():
+        model = Projects
+        exclude = ('id', 'create_time', 'update_time')

@@ -142,8 +142,17 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ],
-    # 在全局DEFAULT_FILTER_BACKENDS指定过滤用的搜索引擎类（SearchFilter）
+    # 在全局DEFAULT_FILTER_BACKENDS指定过滤用的引擎类（搜索和排序）
     # SEARCH_PARAM可以自定义搜索参数名称（默认为search）
-    'DEFAULT_FILTER_BACKENDS': ['rest_framework.filters.SearchFilter'],
-    'SEARCH_PARAM': 'se',
+    # ORDERING_PARAM可以自定义搜索参数名称（默认为ordering）
+    'DEFAULT_FILTER_BACKENDS': ['rest_framework.filters.SearchFilter',
+                                'rest_framework.filters.OrderingFilter'],
+    # 'SEARCH_PARAM': 'se',
+    # 'ORDERING_PARAM': 'or',
+    # 指定分页引擎
+    # PAGE_SIZE指定每页的条数
+    'DEFAULT_PAGINATION_CLASS': 'utils.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    # 测试平台接口文档的全局配置
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
