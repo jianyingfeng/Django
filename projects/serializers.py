@@ -1,5 +1,6 @@
-from rest_framework import serializers
+from rest_framework import serializers, filters
 from rest_framework.validators import UniqueValidator
+from utils.pagination import PageNumberPagination
 
 from .models import Projects
 
@@ -143,7 +144,7 @@ class ProjectModelSerializers(serializers.ModelSerializer):
     interfaces_set = InterfaceSerializers(label='项目附属接口id', help_text='项目附属接口id', many=True, required=False)
     token = serializers.CharField(label='token', help_text='token', read_only=True)
 
-    class Meta():
+    class Meta:
         model = Projects
         # fields指定需要序列化的字段
         # 1、fields指定'__all__'时，则会对所有字段进行序列化
@@ -186,10 +187,24 @@ class ProjectModelSerializers(serializers.ModelSerializer):
         return project_obj
 
 
-class ProjectModelSerializers111(serializers.ModelSerializer):
+class ProjectModelSerializers0120(serializers.ModelSerializer):
     """
     另一个序列化类
     """
-    class Meta():
+    class Meta:
         model = Projects
         exclude = ('id', 'create_time', 'update_time')
+
+
+class ProjectModelSerializers0123(serializers.ModelSerializer):
+    """
+    另一个序列化类
+    """
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    pagination_class = PageNumberPagination
+    search_fields = ['=name', '=leader', '=id']
+    ordering_fields = ['name', 'leader']
+
+    class Meta:
+        model = Projects
+        fields = ('id', 'name')
