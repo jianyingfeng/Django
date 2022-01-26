@@ -46,5 +46,7 @@ urlpatterns = [
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', SchemaView.without_ui(cache_timeout=0), name='schema-json'),  # 导出
     path('swagger/', SchemaView.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),  # redoc美化UI
     path('redoc/', SchemaView.with_ui('redoc', cache_timeout=None), name='schema-redoc'),
+    # 在全局路由表中添加rest_framework.urls路由
+    # rest_framework.urls提供了登入和登出的功能
+    path('api/', include('rest_framework.urls')),
 ]
-

@@ -1,0 +1,5 @@
+INFO 2022-01-24 16:41:10,306 views 26756 16204 [OrderedDict([('id', 17), ('name', '成都万达xxx003项目')])]
+INFO 2022-01-24 16:42:20,906 views 23100 10388 [OrderedDict([('id', 17), ('name', '成都万达xxx003项目')])]
+INFO 2022-01-24 16:43:22,027 views 5096 5304 [OrderedDict([('id', 17), ('name', '鎴愰兘涓囪揪xxx003椤圭洰')])]
+INFO 2022-01-24 17:01:11,813 views 28484 2624 [OrderedDict([('id', 17), ('name', '鎴愰兘涓囪揪xxx003椤圭洰')])]
+2022-01-24 17:19:58,351 - [INFO] - mytest - [msg][OrderedDict([('id', 17), ('name', '鎴愰兘涓囪揪xxx003椤圭洰')])] - [views.py:80 ]

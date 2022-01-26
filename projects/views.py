@@ -1,9 +1,15 @@
+import logging
+
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
 from .models import Projects
 from .serializers import ProjectModelSerializers, ProjectModelSerializers0120, ProjectModelSerializers0123
+from interfaces.serializers import InterfacesSerializer0125
+
+# 定义一个日志器，参数名为settings.py中定义好的日志器名称
+logger = logging.getLogger('mytest')
 
 
 # a、可以继承视图集类ModelViewSet
@@ -52,6 +58,18 @@ class ProjectsViewSet(viewsets.ModelViewSet):
             })
         return Response(inter_list)
 
+    @action(methods=['GET'], detail=True)
+    def interfaces(self, request, *args, **kwargs):
+        obj = self.get_object()
+        queryset = obj.interfaces_set.all()
+        inter_list = []
+        for interface in queryset:
+            inter_list.append({
+                'id': interface.id,
+                'name': interface.name
+            })
+        return Response(inter_list)
+
     # 自定义方法不走序列化类
     # 仅获取项目id和项目名称的接口
     # 1、使用action装饰器可以给自定义action方法生成路由条目
@@ -71,6 +89,8 @@ class ProjectsViewSet(viewsets.ModelViewSet):
         #     }
         #     )
         res = super().list(request, *args, **kwargs)
+        # 输出日志
+        logger.info(res.data)
         return res
 
     # 重写retrieve方法

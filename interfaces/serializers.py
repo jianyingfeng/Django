@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from .models import Interfaces
 
 
 class ProjectsSerializer(serializers.Serializer):
@@ -15,3 +16,9 @@ class InterfacesSerializer(serializers.Serializer):
     # projects = serializers.StringRelatedField()
     # projects = serializers.SlugRelatedField(slug_field='name', read_only=True)
     projects = ProjectsSerializer()
+
+
+class InterfacesSerializer0125(serializers.ModelSerializer):
+    class Meta:
+        model = Interfaces
+        fields = ('id', 'name')

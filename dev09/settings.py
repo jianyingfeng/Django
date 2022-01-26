@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,7 +25,8 @@ SECRET_KEY = 'django-insecure-wssq5_!t!(mel9kfmsa4q1n6n0&r%%l_0sd+2r=1o3)=xd6m3f
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# 指定哪些地址可以访问当前项目
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -156,4 +158,77 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     # 测试平台接口文档的全局配置
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+
+    # 指定使用的认证类
+    # a、在全局指定默认的认证类
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        # b、Session会话认证
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication'
+    ],
+    # 指定使用的权限类
+    # a、在全局指定默认的权限类（当认证通过之后，可以获取何种权限）
+    'DEFAULT_PERMISSION_CLASSES': [
+        # AllowAny不管是否成功认证，都能获取所有权限
+        # IsAuthenticated只要登录，就具备所有权限
+        # IsAdminUser管理员具有所有权限
+        # IsAuthenticatedOrReadOnly，如果登录了就具备所有权限，不登录则为只读权限
+        'rest_framework.permissions.AllowAny',
+    ],
+}
+
+LOGGING = {
+    # 指定日志版本
+    'version': 1,
+    # 是否禁用其他日志
+    'disable_existing_loggers': False,
+    # 定义日志输出格式
+    'formatters': {
+        # 复杂格式
+        'verbose': {
+            'format': '%(asctime)s - [%(levelname)s] - %(name)s - [msg]%(message)s - [%(filename)s:%(lineno)d ]'
+        },
+        # 简单格式
+        'simple': {
+            'format': '%(asctime)s - [%(levelname)s] - [msg]%(message)s'
+        },
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    # 指定日志输出渠道（日志输出的地方）
+    'handlers': {
+        # 指定在console控制台输出的日志配置信息
+        'console': {
+            # 指定日志记录等级
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        # 指定在文件输出的日志配置信息
+        'file': {
+            # 指定日志记录等级
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            # 日志保存位置
+            'filename': os.path.join(BASE_DIR, "logs/mytest.log"),
+            'maxBytes': 100 * 1024 * 1024,
+            'backupCount': 10,
+            'formatter': 'verbose',
+            # 写入的编码格式（以防中文乱码）
+            'encoding': 'utf-8'
+        },
+    },
+    # 定义日志器
+    'loggers': {
+        # 指定日志器的名称
+        'mytest': {  # 定义了一个名为mytest的日志器
+            'handlers': ['console', 'file'],
+            'propagate': True,
+            'level': 'DEBUG',  # 日志器接受的最低日志级别
+        }
+    }
 }
