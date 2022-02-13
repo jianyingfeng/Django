@@ -162,6 +162,8 @@ REST_FRAMEWORK = {
     # 指定使用的认证类
     # a、在全局指定默认的认证类
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        # 使用jwt token认证
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication'
         # b、Session会话认证
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication'
@@ -176,6 +178,9 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
 }
+
+# 指定User模型类
+# AUTH_USER_MODEL = 'user.UserModel'
 
 LOGGING = {
     # 指定日志版本
