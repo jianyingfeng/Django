@@ -21,6 +21,7 @@ urlpatterns = [
     # path('delete/', views.delete_project),
     # path('projects/', views.ProjectsView.as_view()),
     # path('projects/<int:pk>/', views.ProjectsDetailView.as_view()),
+
     # path('projects/', views.ProjectsViewSet.as_view({
     #     'get': 'list',
     #     'post': 'create'

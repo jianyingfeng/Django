@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from rest_framework.documentation import include_docs_urls
+from rest_framework_jwt.views import obtain_jwt_token
 from projects import views
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
@@ -41,6 +42,7 @@ urlpatterns = [
     # path('project/<int:pk>',views.get_project_by_id),
     path('', include('projects.urls')),
     path('', include('interfaces.urls')),
+    path('', include('user.urls')),
     # 指定测试平台接口文档的url
     path('docs/', include_docs_urls(title='测试平台接口文档', description='xxx接口文档')),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', SchemaView.without_ui(cache_timeout=0), name='schema-json'),  # 导出
@@ -49,4 +51,6 @@ urlpatterns = [
     # 在全局路由表中添加rest_framework.urls路由
     # rest_framework.urls提供了登入和登出的功能
     path('api/', include('rest_framework.urls')),
+    # 提供token认证
+    path('user/login/', obtain_jwt_token)
 ]

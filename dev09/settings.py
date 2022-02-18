@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+import datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,7 +41,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'projects',
-    'interfaces'
+    'interfaces',
+    'user'
 ]
 
 MIDDLEWARE = [
@@ -163,7 +165,10 @@ REST_FRAMEWORK = {
     # a、在全局指定默认的认证类
     'DEFAULT_AUTHENTICATION_CLASSES': [
         # 使用jwt token认证
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication'
+        # 1、前端传入用户名和密码
+        # 2、后端返回token值
+        # 3、前端在请求头中传递token，键为Authorization，值为JWT token值
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         # b、Session会话认证
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication'
@@ -181,6 +186,17 @@ REST_FRAMEWORK = {
 
 # 指定User模型类
 # AUTH_USER_MODEL = 'user.UserModel'
+
+# token认证配置
+JWT_AUTH = {
+    # 修改认证请求头的前缀
+    'JWT_AUTH_HEADER_PREFIX': 'bearer',
+    # 修改token过期时间
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+    # 修改处理payload的方法
+    'JWT_RESPONSE_PAYLOAD_HANDLER':
+        'utils.response_payload_handler.jwt_response_payload_handler',
+}
 
 LOGGING = {
     # 指定日志版本

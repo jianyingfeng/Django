@@ -1,5 +1,6 @@
 import logging
 
+from django.db import connection
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -46,18 +47,6 @@ class ProjectsViewSet(viewsets.ModelViewSet):
 
     # 自定义方法不走序列化类
     # 获取项目下接口信息的接口
-    @action(methods=['GET'], detail=True)
-    def interfaces(self, request, *args, **kwargs):
-        obj = self.get_object()
-        queryset = obj.interfaces_set.all()
-        inter_list = []
-        for interface in queryset:
-            inter_list.append({
-                'id': interface.id,
-                'name': interface.name
-            })
-        return Response(inter_list)
-
     @action(methods=['GET'], detail=True)
     def interfaces(self, request, *args, **kwargs):
         obj = self.get_object()

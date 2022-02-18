@@ -78,7 +78,7 @@ from utils.pagination import PageNumberPagination
 # class ProjectsView(APIView):
 class ProjectsView(generics.GenericAPIView):
     """
-    继承GenericAPIView父类（GenericAPIView子类）
+    继承GenericAPIView父类（APIView子类）
     a、具备View的所有特性
     b、具备了APIView的认证、权限、限流功能
     c、还支持搜索、排序、分页功能
