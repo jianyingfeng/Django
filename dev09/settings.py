@@ -165,9 +165,10 @@ REST_FRAMEWORK = {
     # a、在全局指定默认的认证类
     'DEFAULT_AUTHENTICATION_CLASSES': [
         # 使用jwt token认证
-        # 1、前端传入用户名和密码
-        # 2、后端返回token值
-        # 3、前端在请求头中传递token，键为Authorization，值为JWT token值
+        # 1、在全局路由表中添加obtain_jwt_token路由
+        # 2、前端传入用户名和密码
+        # 3、后端返回token值
+        # 4、前端在请求头中传递token，键为Authorization，值为JWT token值
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         # b、Session会话认证
         'rest_framework.authentication.SessionAuthentication',
@@ -175,13 +176,13 @@ REST_FRAMEWORK = {
     ],
     # 指定使用的权限类
     # a、在全局指定默认的权限类（当认证通过之后，可以获取何种权限）
-    'DEFAULT_PERMISSION_CLASSES': [
+    # 'DEFAULT_PERMISSION_CLASSES': [
         # AllowAny不管是否成功认证，都能获取所有权限
         # IsAuthenticated只要登录，就具备所有权限
         # IsAdminUser管理员具有所有权限
         # IsAuthenticatedOrReadOnly，如果登录了就具备所有权限，不登录则为只读权限
-        'rest_framework.permissions.AllowAny',
-    ],
+        # 'rest_framework.permissions.AllowAny',
+    # ],
 }
 
 # 指定User模型类
@@ -193,7 +194,7 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'bearer',
     # 修改token过期时间
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
-    # 修改处理payload的方法
+    # 修改处理payload的函数
     'JWT_RESPONSE_PAYLOAD_HANDLER':
         'utils.response_payload_handler.jwt_response_payload_handler',
 }

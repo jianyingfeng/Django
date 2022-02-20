@@ -1,26 +1,24 @@
 from rest_framework import mixins, viewsets
 from django.contrib.auth.models import User
 from rest_framework.response import Response
-from rest_framework.decorators import action
 
 from .serializers import RegisterUserSerializer, UsernameCountSerializer, EmailCountSerializer
 
 
-class RegisterUserViewSet(viewsets.ModelViewSet):
+class RegisterUserViewSet(viewsets.GenericViewSet):
     queryset = User.objects.all()
     serializer_class = RegisterUserSerializer
 
-    @action(detail=True)
-    def count_username(self, request, username, *args, **kwargs):
-        count = len(User.objects.filter(username=username))
-        return Response({
-            'username': username,
+    def count_username(self, request, *args, **kwargs):
+        count = len(User.objects.filter(name=request.data))
+        data = {
+            'username': request.data,
             'count': count
-        })
+        }
+        return Response(data)
 
-    @action(detail=False)
     def count_email(self, request, *args, **kwargs):
-        count = len(User.objects.filter(email=request.data))
+        count = len(User.objects.filter(name=request.data))
         data = {
             'email': request.data,
             'count': count

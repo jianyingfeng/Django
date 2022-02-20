@@ -1,7 +1,7 @@
 import logging
 
 from django.db import connection
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
@@ -33,6 +33,12 @@ class ProjectsViewSet(viewsets.ModelViewSet):
     interfaces:
     获取项目附属接口数据
     """
+    # 在视图类中指定认证方式，优先级高于全局认证方式
+    # 一个项目一般都是统一的认证方式，无须额外在视图类中指定
+    authentication_classes = []
+    # 在视图类中指定权限类，优先级高于全局
+    permission_classes = [permissions.IsAuthenticated]
+
     queryset = Projects.objects.all()
     serializer_class = ProjectModelSerializers
     """

@@ -26,8 +26,10 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
+        # id字段默认read_only=True,此处无需额外指定
         fields = ('id', 'username', 'password', 'password_confirm', 'email', 'token')
         extra_kwargs = {
+            # username字段在模型类中指定了unique=True，所以此处不需要进行唯一性校验
             'username': {
                 'min_length': 6,
                 'max_length': 20
@@ -40,5 +42,33 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             'email': {
                 'required': True,
                 'write_only': True
+            }
+        }
+
+
+class UsernameCountSerializer(serializers.ModelSerializer):
+    count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'count')
+        extra_kwargs = {
+            'username': {
+                'min_length': 6,
+                'max_length': 20
+            }
+        }
+
+
+class EmailCountSerializer(serializers.ModelSerializer):
+    count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ('email', 'count')
+        extra_kwargs = {
+            'email': {
+                'min_length': 6,
+                'max_length': 20
             }
         }
