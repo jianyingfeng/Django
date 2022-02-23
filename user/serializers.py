@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from rest_framework_jwt.utils import jwt_payload_handler, jwt_encode_handler
+from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handler
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
@@ -10,6 +10,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
     def validate(self, attrs: dict):
         if attrs.get('password') == attrs.get('password_confirm'):
             if not User.objects.filter(email=attrs.get('email')).exists():
+                attrs.pop('password_confirm')
                 return attrs
             else:
                 raise serializers.ValidationError('邮箱已被注册')
@@ -17,9 +18,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('两次密码输入不一致！')
 
     def create(self, validated_data):
-        user = User.objects.create_superuser(username=validated_data['username'],
-                                             email=validated_data['email'],
-                                             password=validated_data['password'])
+        user = User.objects.create_user(**validated_data)
         payload = jwt_payload_handler(user)
         user.token = jwt_encode_handler(payload)
         return user
@@ -42,33 +41,5 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             'email': {
                 'required': True,
                 'write_only': True
-            }
-        }
-
-
-class UsernameCountSerializer(serializers.ModelSerializer):
-    count = serializers.IntegerField(read_only=True)
-
-    class Meta:
-        model = User
-        fields = ('username', 'count')
-        extra_kwargs = {
-            'username': {
-                'min_length': 6,
-                'max_length': 20
-            }
-        }
-
-
-class EmailCountSerializer(serializers.ModelSerializer):
-    count = serializers.IntegerField(read_only=True)
-
-    class Meta:
-        model = User
-        fields = ('email', 'count')
-        extra_kwargs = {
-            'email': {
-                'min_length': 6,
-                'max_length': 20
             }
         }

@@ -1,11 +1,14 @@
-from rest_framework import mixins, viewsets
+from rest_framework import mixins, viewsets, generics
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 
 from .serializers import RegisterUserSerializer, UsernameCountSerializer, EmailCountSerializer
 
 
-class RegisterUserViewSet(viewsets.GenericViewSet):
+class RegisterUserView(generics.CreateAPIView):
+    """
+    这个视图类仅支持创建用户的方法、以及下面两个自定义的方法
+    """
     queryset = User.objects.all()
     serializer_class = RegisterUserSerializer
 
