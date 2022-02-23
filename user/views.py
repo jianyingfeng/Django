@@ -8,7 +8,7 @@ from .serializers import RegisterUserSerializer
 
 class RegisterUserViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     """
-    这个视图类支持增删改查六个方法（查有两个，改有两个），以及下面的两个自定义方法
+    这个视图类支持一个新增方法，以及下面的两个自定义方法
     """
     queryset = User.objects.all()
     serializer_class = RegisterUserSerializer
