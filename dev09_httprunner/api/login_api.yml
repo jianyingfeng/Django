@@ -13,23 +13,53 @@
 
 #name指定当前用例名称
 name: 正常登录
+
 #variables指定变量
 variables:
-    var1: value1
-    var2: value2
+    username: "admin"
+    password: "123456"
+
+#指定根路径
+base_url: "http://127.0.0.1:8000/"
+
 #request指定当前请求的配置信息
 request:
-    url: http://127.0.0.1:8000/user/login/
+#    这里会拼接根路径
+    url: "user/login/"
 #    method指定请求方法，value不区分大小写
     method: POST
     headers:
-        Content-Type: "application/json"
-    json:
-        username: "admin"
-        password: 123456
-validate:
-    - eq: ["status_code", 200]
+#        Content-Type: "application/json"
+        Content-Type: "application/x-www-form-urlencoded"
 
+#    指定json格式的请求参数
+#    json:
+#        username: "admin"
+#        password: 123456
+
+#   指定form表单格式的请求参数
+    data:
+#        $引用变量
+        username: "$username"
+        password: "$password"
+
+#   指定路径查询参数
+    params:
+        s: 1
+        p: 3
+
+#断言方式，在httprunner.paser.get_uniform_comparator中进行查看
+validate:
+#    第一个值为实际值，第二个值为预期值
+#    实际值有status_code, cookies, headers, content, text, json
+#    如果接口响应是一个json数据，那么使用content, text, json去获取数据的效果是一样的，都是一个字典或者嵌套字典的列表
+    - eq: ["status_code", 200]
+#   响应结果（字典）中是否包含键username（包含条件在在httprunner.builtin.contains）
+#    - contains: ["json", username]
+#    取响应结果（字典）中username对应的值
+    - eq: ["json.username", admin]
+#    取响应结果（字典）中username所跟的列表中的第一个值
+#    - eq: ["json.username.0", 111]
 #运行方式：
 #方式一、hrun + yam文件相对路径 + 其他参数
-#方拾二、通过python程序执行
+#方式二、通过python程序执行
