@@ -164,7 +164,7 @@ REST_FRAMEWORK = {
     # 指定使用的认证类
     # a、在全局指定默认的认证类
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 使用jwt token认证
+        # a、使用jwt token认证
         # 1、在全局路由表中添加obtain_jwt_token路由
         # 2、前端传入用户名和密码
         # 3、后端返回token值

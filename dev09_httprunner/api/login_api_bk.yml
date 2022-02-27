@@ -1,0 +1,67 @@
+#Yml文件：
+#1、yml是数据格式，不是数据类型
+#2、yml文件的后缀是yml或者yaml
+#3、使用#写注释，注释只能单独写在一行
+#4、yml有两种结构，一种是key:value，冒号和value之间必须有空格
+#另一个是-key:value，value是列表
+#5、yaml文件中子级条目前必须有缩进（一般为两个空格，习惯写四个空格）
+#6、数据类型：
+#1、加了双引号或者单引号，即为字符串类型
+#2、没加双引号或者单引号，但是含有字母，也为字符串类型
+#3、true、false、on、off为布尔类型，null为空
+#4、纯数字为int或float类型
+
+#name指定当前用例名称
+name: 正常登录
+
+#variables指定变量
+variables:
+#    引用全局变量，变量定义在.env文件中
+    username: "${ENV(USERNAME)}"
+    password: "${ENV(PASSWORD)}"
+
+#指定根路径
+base_url: "${ENV(BASE_URL)}"
+
+#request指定当前请求的配置信息
+request:
+#    这里会拼接根路径
+    url: "user/login/"
+#    method指定请求方法，value不区分大小写
+    method: POST
+    headers:
+#        Content-Type: "application/json"
+#        可以调用debugtalk中定义的函数
+        User-Agent: "${random_generate_uagent()}"
+        Content-Type: "application/x-www-form-urlencoded"
+#    指定json格式的请求参数
+#    json:
+#        username: "admin"
+#        password: 123456
+
+#   指定form表单格式的请求参数
+    data:
+#        $引用变量
+        username: "$username"
+        password: "$password"
+
+#   指定路径查询参数
+    params:
+        s: 1
+        p: 3
+
+#断言方式，在httprunner.paser.get_uniform_comparator中进行查看
+validate:
+#    第一个值为实际值，第二个值为预期值
+#    实际值有status_code, cookies, headers, content, text, json
+#    如果接口响应是一个json数据，那么使用content, text, json去获取数据的效果是一样的，都是一个字典或者嵌套字典的列表
+    - eq: ["status_code", 200]
+#   响应结果（字典）中是否包含键username（包含条件在在httprunner.builtin.contains）
+#    - contains: ["json", username]
+#    取响应结果（字典）中username对应的值
+    - eq: ["json.username", admin]
+#    取响应结果（字典）中username所跟的列表中的第一个值
+#    - eq: ["json.username.0", 111]
+#运行方式：
+#方式一、hrun + yam文件相对路径 + 其他参数
+#方式二、通过python程序执行

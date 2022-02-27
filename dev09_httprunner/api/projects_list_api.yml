@@ -1,0 +1,18 @@
+
+name: "获取项目列表数据"
+
+base_url: "${ENV(BASE_URL)}"
+
+request:
+    url: /projects/
+    method: GET
+    headers:
+        Accept: "application/json"
+#        使用关联用例（testcase）中的提取到的变量
+        Authorization: "bearer $token"
+
+    params:
+        page: 2
+        page_size: 1
+validate:
+    - eq: ["status_code", 200]

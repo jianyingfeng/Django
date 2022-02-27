@@ -1,0 +1,19 @@
+# 实现关联接口测试
+config:
+    name: "获取项目列表数据"
+
+teststeps:
+-
+    name: "登录获取token"
+#    导入基础用例
+    api: dev09_httprunner/api/login_api.yml
+#    提取响应信息
+    extract:
+        - token: content.token
+# 断言可以不写，会取基础用例中的断言条件，如果写了，则会取合并覆盖原则
+#    validate:
+#        - eq: ["status_code", 200]
+-
+    name: "获取项目列表"
+#    导入基础用例
+    api: dev09_httprunner/api/projects_list_api.yml

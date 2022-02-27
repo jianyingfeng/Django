@@ -1,5 +1,11 @@
+import random
 
-import time
-
-def sleep(n_secs):
-    time.sleep(n_secs)
+def random_generate_uagent():
+    user_agent_list = [
+        'Mozilla 5.0',
+        'Mozilla buyu',
+        'Mozilla re shui',
+        'Mozilla lemon',
+        'Mozilla xxx',
+    ]
+    return random.choice(user_agent_list)

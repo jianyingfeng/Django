@@ -35,7 +35,7 @@ class ProjectsViewSet(viewsets.ModelViewSet):
     """
     # 在视图类中指定认证方式，优先级高于全局认证方式
     # 一个项目一般都是统一的认证方式，无须额外在视图类中指定
-    authentication_classes = []
+    # authentication_classes = []
     # 在视图类中指定权限类，优先级高于全局
     permission_classes = [permissions.IsAuthenticated]
 
