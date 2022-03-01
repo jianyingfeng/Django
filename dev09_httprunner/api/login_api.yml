@@ -1,5 +1,5 @@
-name: 正常登录
 
+name: 登录接口用例模板
 
 variables:
     username: "${ENV(USERNAME)}"
@@ -29,4 +29,4 @@ request:
 
 validate:
     - eq: ["status_code", 200]
-    - eq: ["json.username", admin]
+#    - eq: ["json.username", admin]
