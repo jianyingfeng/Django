@@ -1,13 +1,7 @@
 
 name: 登录接口用例模板
 
-variables:
-    username: "${ENV(USERNAME)}"
-    password: "${ENV(PASSWORD)}"
-
-
 base_url: "${ENV(BASE_URL)}"
-
 
 request:
 
@@ -28,5 +22,4 @@ request:
         p: 3
 
 validate:
-    - eq: ["status_code", 200]
-#    - eq: ["json.username", admin]
+    - eq: ["status_code", "$status_code"]

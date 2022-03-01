@@ -4,8 +4,7 @@ config:
 
 teststeps:
 -
-    name: "登录"
+    name: "$title"
     api: "api/login_api.yml"
     validate:
-#        - eq: ["status_code", "$status_code"]
-        - contains: ["content", "token"]
+        - contains: ["content", "$msg"]

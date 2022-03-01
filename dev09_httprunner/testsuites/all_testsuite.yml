@@ -1,0 +1,12 @@
+
+config:
+    name: "登录"
+
+testcases:
+-
+    name: "登录接口多场景用例"
+    testcase: "testcases/login_testcase.yml"
+    parameters:
+#        - title-username-password-status_code-msg:
+#              - ["正常登录", "admin", "123456", 200, "token"]
+        - title-username-password-status_code-msg: ${P(data/data.csv)}
