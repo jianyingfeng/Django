@@ -4,9 +4,28 @@ config:
 
 testcases:
 -
-    name: "登录接口多场景用例"
-    testcase: "testcases/login_testcase.yml"
-    parameters:
-#        - title-username-password-status_code-msg:
-#              - ["正常登录", "admin", "123456", 200, "token"]
-        - title-username-password-status_code-msg: ${P(data/data.csv)}
+    name: 1.登录成功
+    testcase: testcases/login_testcase.yml
+    variables:
+        title: 登录成功
+        username: "admin"
+        password: 123456
+        status_code: 200
+        msg: token
+
+-
+    name: 2.密码错误
+    testcase: testcases/login_testcase.yml
+    variables:
+        title: 密码错误
+        username: "admin"
+        password: 123
+        status_code: 400
+        msg: non_field_errors
+
+# 变量的优先级
+# testsuite-testcase-variables > testsuite-config-variables > testcase-teststep-variables > testcase-config-variables >
+# api-variables
+
+# base_url的优先级
+# testsuite-config-base_url > testcase-config-base_url > api-base_url

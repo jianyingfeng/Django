@@ -1,0 +1,11 @@
+
+config:
+    name: "登录"
+
+testcases:
+-
+    name: 1.登录成功
+    testcase: testcases/login_testcase.yml
+    parameters:
+        title-username-password-status_code-msg: ${P(data/data.csv)}
+

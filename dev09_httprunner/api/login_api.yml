@@ -20,6 +20,3 @@ request:
     params:
         s: 1
         p: 3
-
-validate:
-    - eq: ["status_code", "$status_code"]
