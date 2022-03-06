@@ -11,11 +11,17 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import sys
 import os
 import datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# 因为把所有的子应用都移到了apps目录下，所有需要作如下操作
+# sys.path是个列表，是Django依次寻找子应用的路径
+# 先将BASE_DIR和apps拼接，再将其插入到sys.path的第一个位置，所以Django才能搜寻到子应用
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -42,7 +48,13 @@ INSTALLED_APPS = [
     'drf_yasg',
     'projects',
     'interfaces',
-    'user'
+    'user',
+    'testcases',
+    'configures',
+    'reports',
+    'testsuites',
+    'envs',
+    'debugtalks'
 ]
 
 MIDDLEWARE = [
