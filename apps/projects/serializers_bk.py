@@ -75,7 +75,9 @@ class ProjectSerializers(serializers.Serializer):
     # 如果该字段需要输入，则必须指定queryset参数，同时关联参数必须有唯一约束
     # interfaces_set = serializers.SlugRelatedField(slug_field='name', many=True, queryset=Interfaces.objects.all())
 
-    interfaces_set = InterfaceSerializers(label='项目附属接口id', help_text='项目附属接口id', many=True, required=False)
+    interfaces_set = InterfaceSerializers(label='项目附属接口id、name、tester',
+                                          help_text='项目附属接口id、name、tester',
+                                          many=True, required=False)
     # format参数可以对时间进行格式化输出
     update_time = serializers.DateTimeField(label='更新时间', help_text='更新时间', format='%Y-%m-%d %H:%M:%S', required=False)
     create_time = serializers.DateTimeField(label='创建时间', help_text='创建时间', format='%Y-%m-%d %H:%M:%S', required=False)

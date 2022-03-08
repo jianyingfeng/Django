@@ -12,7 +12,7 @@ from interfaces.models import Interfaces
 from testsuites.models import Testsuites
 from testcases.models import Testcases
 from configures.models import Configures
-from interfaces.serializers import InterfacesSerializer0125
+# from interfaces.serializers import InterfacesSerializer0125
 
 # 定义一个日志器，参数名为settings.py中定义好的日志器名称
 logger = logging.getLogger('mytest')
