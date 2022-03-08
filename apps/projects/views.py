@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 from django.db.models import Q, Count, Avg, Max, Min
 
 from .models import Projects
-from .serializers import ProjectModelSerializers
+from .serializers import ProjectModelSerializers, ProjectModelSerializers0123, ProjectModelSerializers0307
 from interfaces.models import Interfaces
 from testsuites.models import Testsuites
 from testcases.models import Testcases
@@ -83,19 +83,13 @@ class ProjectsViewSet(viewsets.ModelViewSet):
             item['configures'] = configures_num
         return response
 
-    # 自定义方法不走序列化类
-    # 获取项目下接口信息的接口
+    # 获取项目下接口id和名称
+    # 通过替换序列化器类来实现
     @action(methods=['GET'], detail=True)
     def interfaces(self, request, *args, **kwargs):
-        obj = self.get_object()
-        queryset = obj.interfaces_set.all()
-        inter_list = []
-        for interface in queryset:
-            inter_list.append({
-                'id': interface.id,
-                'name': interface.name
-            })
-        return Response(inter_list)
+        project_obj = super().retrieve(request, *args, **kwargs)
+        response = project_obj.data['interfaces']
+        return Response(response)
 
     # 自定义方法不走序列化类
     # 仅获取项目id和项目名称的接口
@@ -167,6 +161,8 @@ class ProjectsViewSet(viewsets.ModelViewSet):
         # 获取请求方法
         if self.action == 'names':
             return ProjectModelSerializers0123
+        elif self.action == 'interfaces':
+            return ProjectModelSerializers0307
         else:
             return super().get_serializer_class()
 

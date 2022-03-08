@@ -8,8 +8,8 @@ from debugtalks.models import DebugTalks
 from .models import Projects
 
 
+# 这个类不会返回更新时间
 class ProjectModelSerializers(serializers.ModelSerializer):
-
     class Meta:
         model = Projects
         exclude = ('update_time',)
@@ -25,3 +25,26 @@ class ProjectModelSerializers(serializers.ModelSerializer):
         # 外键传值的写法如下：
         DebugTalks.objects.create(project=instance)
         return instance
+
+
+# 这个类只会返回项目id、项目名称
+class ProjectModelSerializers0123(serializers.ModelSerializer):
+    class Meta:
+        model = Projects
+        fields = ('id', 'name')
+
+
+# 这个类只会返回接口id和名称
+class InterfaceModelSerializers(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+
+
+# 这个类只会返回接口id和接口名称
+class ProjectModelSerializers0307(serializers.ModelSerializer):
+    interfaces = InterfaceModelSerializers(label='项目附属接口id及名称', help_text='项目附属接口id及名称',
+                                           many=True, required=False)
+
+    class Meta:
+        model = Projects
+        fields = ('interfaces',)
