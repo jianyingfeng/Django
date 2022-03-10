@@ -12,6 +12,7 @@ from interfaces.models import Interfaces
 from testsuites.models import Testsuites
 from testcases.models import Testcases
 from configures.models import Configures
+
 # from interfaces.serializers import InterfacesSerializer0125
 
 # 定义一个日志器，参数名为settings.py中定义好的日志器名称
@@ -68,17 +69,24 @@ class ProjectsViewSet(viewsets.ModelViewSet):
             interfaces_num = interfaces_qs.count()
             # 4、获取单个项目下的套件的数量
             testsuites_num = Testsuites.objects.filter(project=item['id']).count()
-            # 定义一个空列表，用来存储单个项目下的接口id
-            interfaces_id_list = []
-            for i in range(0, len(interfaces_qs)):
-                interfaces_id_list.append(interfaces_qs[i].id)
-            # 5、利用分组查询获取interfaces_id_list中各个接口id所关联的测试用例数量
-            testcases_num = Testcases.objects.filter(interface__in=interfaces_id_list).count()
-            # 6、利用分组查询获取interfaces_id_list中各个接口id所关联的测试配置数量
-            configures_num = Configures.objects.filter(interface__in=interfaces_id_list).count()
+
+            # # 获取测试用例数量、测试配置数量的方法一：
+            # # 定义一个空列表，用来存储单个项目下的接口id
+            # interfaces_id_list = []
+            # for i in range(0, len(interfaces_qs)):
+            #     interfaces_id_list.append(interfaces_qs[i].id)
+            # # 5、利用分组查询获取interfaces_id_list中各个接口id所关联的测试用例数量
+            # testcases_num = Testcases.objects.filter(interface__in=interfaces_id_list).count()
+            # # 6、利用分组查询获取interfaces_id_list中各个接口id所关联的测试配置数量
+            # configures_num = Configures.objects.filter(interface__in=interfaces_id_list).count()
+
+            # 获取测试用例数量、测试配置数量的方法二：
+            # 通过关联字段查询项目下关联的测试用例数量、测试配置数量
+            testcases_num = Testcases.objects.filter(interface__project__id=item['id']).count()
+            configures_num = Configures.objects.filter(interface__project__id=item['id']).count()
             # 7、将各个数量添加到响应中
             item['interfaces'] = interfaces_num
-            item['testsuites'] = testsuites_num
+            item['testsuits'] = testsuites_num
             item['testcases'] = testcases_num
             item['configures'] = configures_num
         return response
@@ -101,14 +109,6 @@ class ProjectsViewSet(viewsets.ModelViewSet):
     # @action(methods=['GET'], detail=False, url_path='xxx', url_name='yyy')
     @action(methods=['GET'], detail=False)
     def names(self, request, *args, **kwargs):
-        # queryset = self.get_queryset()
-        # pro_list = []
-        # for project in queryset:
-        #     pro_list.append({
-        #         'id': project.id,
-        #         'name': project.name
-        #     }
-        #     )
         res = super().list(request, *args, **kwargs)
         # 输出日志
         logger.info(res.data)
@@ -172,3 +172,12 @@ class ProjectsViewSet(viewsets.ModelViewSet):
 # 3、如果父类的方法满足需求，则直接调用
 # 4、如果父类的方法大部分满足需求，则重写
 # 5、如果父类的方法完全不满足需求，则自定义
+
+# 视图类方法的总结：
+# 1、视图类继承了ModelViewSet，则拥有增删改查6个接口
+# 2、上述6个接口可以用现成的，如不满足需求可以进行改造
+# 改造原则：
+# 2.1、如果是对自身模型类进行字段的增、删，则去改造序列化器类
+# 2.2、如果需要查询到关联表的字段值，则通过自定义序列化器类，将关联表的字段进行序列化输出
+# 2.3、如果涉及到关联表的聚合运算，则直接在action方法中进行聚合运算，再将结果添加到响应中
+# 2.4、创建关联表数据，则改造序列化器类中的create方法

@@ -11,3 +11,4 @@ INFO 2022-01-24 17:01:11,813 views 28484 2624 [OrderedDict([('id', 17), ('name',
 2022-02-16 17:38:38,606 - [INFO] - mytest - [msg][OrderedDict([('id', 17), ('name', '成都万达xxx003项目')])] - [views.py:82 ]
 2022-02-16 17:40:21,657 - [INFO] - mytest - [msg][OrderedDict([('id', 17), ('name', '成都万达xxx003项目')])] - [views.py:82 ]
 2022-03-07 17:03:32,414 - [INFO] - mytest - [msg][OrderedDict([('id', 10), ('name', '项目3')]), OrderedDict([('id', 15), ('name', '这是一个跨时代的3255项目')]), OrderedDict([('id', 17), ('name', '这是一个跨时代的347项目')])] - [views.py:120 ]
+2022-03-09 17:05:58,555 - [INFO] - mytest - [msg][OrderedDict([('id', 15), ('name', '这是一个跨时代的3255项目')]), OrderedDict([('id', 17), ('name', '这是一个跨时代的347项目')])] - [views.py:114 ]
