@@ -14,19 +14,29 @@ class ConfiguresSerializer(serializers.Serializer):
     name = serializers.CharField()
 
 
-# 给获取接口列表使用的序列化器类
+# 需求：
+# 获取接口列表时需要返回项目id、项目名称
+# 创建、更新接口时仅需要传递项目id
 class InterfacesSerializer(serializers.ModelSerializer):
     # 接口所属项目名称
     # 父表数据只有一条，不需要加many=True
+    # 自动指定了read_only = True, 该字段仅格式化输出
     project = serializers.StringRelatedField(label='接口所属项目名称', help_text='接口所属项目名称')
-    # 接口所属项目id，在创建数据的时候，前端传递的是项目id，to_internal_value方法会自动返回模型对象
-    # 所以要修改create函数和update函数
+    # 接口所属项目id，在创建数据的时候，前端传递的是项目id，PrimaryKeyRelatedField类中to_internal_value方法会自动返回模型对象
+    # 所以要修改create方法和update方法，都改太麻烦，就改to_internal_value方法，从而实现在
+    # 调用create方法和update方法之前对数据进行修改
     project_id = serializers.PrimaryKeyRelatedField(label='接口所属项目id', help_text='接口所属项目id',
                                                     queryset=Projects.objects.all())
 
     def to_internal_value(self, data):
         result = super().to_internal_value(data)
-        result['project_id'] = result['project_id'].id
+        # 方式一：
+        # result的project_id字段值是一个project模型对象，需要替换成project的id
+        # result['project_id'] = result['project_id'].id
+
+        # 方式二：
+        # 将project模型对象赋值给project字段，并将project_id删除
+        result['project'] = result.pop('project_id')
         return result
 
     # def create(self, validated_data):
@@ -53,7 +63,7 @@ class TestcasesSerializer0308(serializers.ModelSerializer):
 
     class Meta:
         model = Interfaces
-        fields = ('testcases_set', )
+        fields = ('testcases_set',)
 
 
 class ConfiguresSerializer0308(serializers.ModelSerializer):
@@ -63,4 +73,4 @@ class ConfiguresSerializer0308(serializers.ModelSerializer):
 
     class Meta:
         model = Interfaces
-        fields = ('configures', )
+        fields = ('configures',)

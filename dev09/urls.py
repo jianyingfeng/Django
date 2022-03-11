@@ -42,6 +42,7 @@ urlpatterns = [
     # path('project/<int:pk>',views.get_project_by_id),
     path('', include('projects.urls')),
     path('', include('interfaces.urls')),
+    path('', include('envs.urls')),
     path('', include('user.urls')),
     # 指定测试平台接口文档的url
     path('docs/', include_docs_urls(title='测试平台接口文档', description='xxx接口文档')),
