@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 处理跨域请求步骤1、添加处理前端跨域的子应用
+    'corsheaders',
     'rest_framework',
     'drf_yasg',
     'projects',
@@ -60,12 +62,24 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # 处理跨域请求步骤2、添加处理跨域的中间件，必须在CommonMiddleware之前
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# 处理跨域请求步骤3、允许所有域名访问后端接口，默认为False
+CORS_ORIGIN_ALLOW_ALL = True
+# 或者设置白名单
+# CORS_ORIGIN_WHITELIST = [
+#     'http://192.168.3.9:8080'
+# ]
+# 是否允许携带cookie
+# CORS_ALLOW_CREDENTIALS = True
+
 
 ROOT_URLCONF = 'dev09.urls'
 
@@ -203,7 +217,7 @@ REST_FRAMEWORK = {
 # token认证配置
 JWT_AUTH = {
     # 修改认证请求头的前缀
-    'JWT_AUTH_HEADER_PREFIX': 'bearer',
+    # 'JWT_AUTH_HEADER_PREFIX': 'bearer',
     # 修改token过期时间
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
     # 修改处理payload的函数

@@ -113,7 +113,7 @@ class ProjectsViewSet(viewsets.ModelViewSet):
 
     # 步骤2
     # 重写过滤方法
-    # 当方法名为name时,不作过滤
+    # 当方法名为names时,不作过滤
     def filter_queryset(self, queryset):
         if self.action == 'names':
             return queryset
@@ -122,7 +122,7 @@ class ProjectsViewSet(viewsets.ModelViewSet):
 
     # 步骤3
     # 重写分页方法
-    # 当方法名为name时,不作分页
+    # 当方法名为names时,不作分页
     def paginate_queryset(self, queryset):
         if self.action == 'names':
             return None

@@ -131,11 +131,11 @@ class ProjectsViewSet(viewsets.ModelViewSet):
     # 步骤1
     # 重写get_queryset方法
     # 当方法名为name时,替换查询集
-    def get_queryset(self):
-        if self.action == 'names':
-            return self.queryset.filter(name__icontains=3)
-        else:
-            return super().get_queryset()
+    # def get_queryset(self):
+    #     if self.action == 'names':
+    #         return self.queryset.filter(name__icontains=3)
+    #     else:
+    #         return super().get_queryset()
 
     # 步骤2
     # 重写过滤方法
