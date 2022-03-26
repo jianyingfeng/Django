@@ -1,4 +1,5 @@
 import re
+import json
 
 from rest_framework import serializers, filters
 from rest_framework.validators import UniqueValidator
@@ -74,7 +75,7 @@ class TestcasesSerializer(serializers.ModelSerializer):
             pass
         else:
             try:
-                attr = eval(attr)
+                attr = json.loads(attr)
             except:
                 raise serializers.ValidationError('include参数格式有误')
             config = attr.get('config')
@@ -84,17 +85,32 @@ class TestcasesSerializer(serializers.ModelSerializer):
             else:
                 if not Configures.objects.filter(id=config).exists():
                     raise serializers.ValidationError(f'config id：{config}不存在')
-                testcases_list_new = []
-                for i in testcases_list:
-                    if i not in testcases_list_new:
-                        testcases_list_new.append(i)
-                for item in testcases_list_new:
-                    if not Testcases.objects.filter(id=item).exists():
-                        raise serializers.ValidationError(f'testcase id：{item}不存在')
+            testcases_list_new = []
+            for i in testcases_list:
+                if i not in testcases_list_new:
+                    testcases_list_new.append(i)
+            for item in testcases_list_new:
+                if not Testcases.objects.filter(id=item).exists():
+                    raise serializers.ValidationError(f'testcase id：{item}不存在')
         attr['testcases'] = testcases_list_new
         return attr
 
+    # 创建和更新数据的时候需要将前端传递的参数进行改造
     def to_internal_value(self, data):
         result = super().to_internal_value(data)
         result['interface_id'] = result.pop('interface').get('iid')
         return result
+
+
+class TestcasesRunSerializer(serializers.ModelSerializer):
+    env_id = serializers.IntegerField(label='接口关联的环境配置id', help_text='接口关联的环境配置id',
+                                      validators=[IsIdExists('env')])
+
+    class Meta:
+        model = Testcases
+        fields = ('id', 'env_id')
+        extra_kwargs = {
+            'env_id': {
+                'write_only': True
+            }
+        }

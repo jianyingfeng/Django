@@ -280,3 +280,6 @@ LOGGING = {
         }
     }
 }
+
+# 运行用例时生成
+PROJECT_DIR = os.path.join(BASE_DIR, 'projects_dir')

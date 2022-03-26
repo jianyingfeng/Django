@@ -1,17 +1,10 @@
 import json
-import os
-import ast
-from datetime import datetime
 
-from django.conf import settings
 from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework.decorators import action
 
 from testcases.models import Testcases
-from testcases.serializers import TestcasesSerializer, TestcasesRunSerializer
-from envs.models import Envs
-from utils import common
+from testcases.serializers import TestcasesSerializer
 
 
 class TestcasesViewSet(viewsets.ModelViewSet):
@@ -32,7 +25,7 @@ class TestcasesViewSet(viewsets.ModelViewSet):
             for k, v in header_dict.items():
                 header_list.append({'key': k, 'value': v})
 
-        variable_list = json.loads(instance.request)['test']['request'].get('data')
+        variable_list = json.loads(instance.request)['test']['variables']
         variable_list_new = []
         if variable_list:
             for item in variable_list:
@@ -62,17 +55,6 @@ class TestcasesViewSet(viewsets.ModelViewSet):
                      else str(type(item.get('expected')))[8:-2]
                      })
 
-        globalvar_list = json.loads(instance.request)['test'].get('variables')
-        globalvar_list_new = []
-        if globalvar_list:
-            for item in globalvar_list:
-                globalvar_list_new.append(
-                    {'key': list(item.keys())[0],
-                     'value': list(item.values())[0],
-                     'param_type': 'string' if str(type(list(item.values())[0]))[8:-2] == 'str' else
-                     str(type(list(item.values())[0]))[8:-2]}
-                )
-
         parameterized_list = json.loads(instance.request)['test'].get('parameters')
         parameterized_list_new = []
         if parameterized_list:
@@ -95,7 +77,7 @@ class TestcasesViewSet(viewsets.ModelViewSet):
         response = {
             'author': instance.author,
             'testcase_name': instance.name,
-            'selected_configure_id': eval(instance.include)['config'],
+            'selected_configure_id': json.loads(instance.include)['config'],
             'selected_interface_id': instance.interface_id,
             # 方法一：使用interface_id作为过滤条件
             # 'selected_project_id': Projects.objects.get(
@@ -107,7 +89,7 @@ class TestcasesViewSet(viewsets.ModelViewSet):
             # ).id,
             # 方法三：
             'selected_project_id': instance.interface.project.id,
-            'selected_testcase_id': eval(instance.include)['testcases'],
+            'selected_testcase_id': json.loads(instance.include)['testcases'],
             'method': json.loads(instance.request)['test']['request']['method'],
             'url': json.loads(instance.request)['test']['request']['url'],
             'param': param_list,
@@ -115,40 +97,14 @@ class TestcasesViewSet(viewsets.ModelViewSet):
             # 'variable': json.loads(instance.request)['test']['variables'],
             # 视频中globalVar取的是variable的值
             'variable': variable_list_new,
-            # 将字典转为json字符串，不能使用str
-            # 'jsonVariable': str(json.loads(instance.request)['test']['request'].get('json')),
-            'jsonVariable': json.dumps(json.loads(instance.request)['test']['request'].get('json')),
+            # null被转为None了
+            'jsonVariable': str(json.loads(instance.request)['test']['request'].get('json')),
             'extract': extract_list_new,
             'validate': validate_list_new,
-            'globalVar': globalvar_list_new,
+            # 'globalVar': 未完成
             'parameterized': parameterized_list_new,
             'setup_Hooks': setup_hooks_list_new,
             'teardown_Hooks': teardown_hooks_list_new
 
         }
         return Response(response)
-
-    @action(methods=['POST'], detail=True)
-    def run(self, request, *args, **kwargs):
-        # 获取用例模型对象
-        instance = self.get_object()
-        # 获取env_id
-        serializer = self.get_serializer(data=request.data)
-        # 疑问：这个返回的是什么
-        serializer.is_valid(raise_exception=True)
-        env_id = serializer.validated_data.get('env_id')
-        env = Envs.objects.get(id=env_id)
-        # 创建时间戳目录
-        testcase_dir_path = os.path.join(settings.PROJECT_DIR, datetime.strftime(datetime.now(), '%Y%m%d%H%M%S'))
-        os.makedirs(testcase_dir_path)
-        # 创建以项目名命名的目录
-        # 创建以debugtalk.py，yaml文件
-        common.generate_testcase_file(instance, env, testcase_dir_path)
-        # 运行用例并生成测试报告
-        return common.run(instance, testcase_dir_path)
-
-    def get_serializer_class(self):
-        if self.action == 'run':
-            return TestcasesRunSerializer
-        else:
-            return super().get_serializer_class()
