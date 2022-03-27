@@ -1,4 +1,12 @@
-from httprunner.task import HttpRunner
+# import json
 
-h = HttpRunner()
-h.run(r'C:\Users\jianyingfeng\PycharmProjects\Django\projects_dir\20220325165048\NCT 测试环境\登录接口\NCT登录正向用例.yaml')
+# print(eval('{"config":null,"testcases":[1]}'))
+
+# print(json.loads('{"config":null,"testcases":[1]}'))
+
+
+a = []
+for i in a:
+    print(1)
+
+print(2)

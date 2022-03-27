@@ -5,6 +5,7 @@ from rest_framework import serializers, filters
 from rest_framework.validators import UniqueValidator
 from utils.pagination import PageNumberPagination
 from utils.validator import IsIdExists
+from utils.base_serializers import RunSerializer
 
 from testcases.models import Testcases
 from interfaces.models import Interfaces
@@ -102,15 +103,22 @@ class TestcasesSerializer(serializers.ModelSerializer):
         return result
 
 
-class TestcasesRunSerializer(serializers.ModelSerializer):
-    env_id = serializers.IntegerField(label='接口关联的环境配置id', help_text='接口关联的环境配置id',
-                                      validators=[IsIdExists('env')])
-
-    class Meta:
+# 集成公共序列化器类
+class TestcasesRunSerializer(RunSerializer):
+    # 继承内部类的写法
+    class Meta(RunSerializer.Meta):
         model = Testcases
-        fields = ('id', 'env_id')
-        extra_kwargs = {
-            'env_id': {
-                'write_only': True
-            }
-        }
+
+
+# class TestcasesRunSerializer(serializers.ModelSerializer):
+#     env_id = serializers.IntegerField(label='接口关联的环境配置id', help_text='接口关联的环境配置id',
+#                                       validators=[IsIdExists('env')])
+#
+#     class Meta:
+#         model = Testcases
+#         fields = ('id', 'env_id')
+#         extra_kwargs = {
+#             'env_id': {
+#                 'write_only': True
+#             }
+#         }

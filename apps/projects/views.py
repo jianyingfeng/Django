@@ -1,17 +1,23 @@
 import logging
+import os
+from datetime import datetime
 
 from django.db import connection
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db.models import Q, Count, Avg, Max, Min
+from django.conf import settings
 
+from utils import common
 from .models import Projects
-from .serializers import ProjectModelSerializers, ProjectModelSerializers0123, ProjectModelSerializers0307
+from .serializers import ProjectModelSerializers, ProjectModelSerializers0123,\
+    ProjectModelSerializers0307, ProjectsRunSerializer
 from interfaces.models import Interfaces
 from testsuites.models import Testsuites
 from testcases.models import Testcases
 from configures.models import Configures
+from envs.models import Envs
 
 # from interfaces.serializers import InterfacesSerializer0125
 
@@ -43,7 +49,7 @@ class ProjectsViewSet(viewsets.ModelViewSet):
     # 一个项目一般都是统一的认证方式，无须额外在视图类中指定
     # authentication_classes = []
     # 在视图类中指定权限类，优先级高于全局
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
     queryset = Projects.objects.all()
     serializer_class = ProjectModelSerializers
     """
@@ -124,6 +130,30 @@ class ProjectsViewSet(viewsets.ModelViewSet):
         # res.data.pop('update_time')
         return res
 
+    @action(methods=['POST'], detail=True)
+    def run(self, request, *args, **kwargs):
+        # 获取项目模型对象
+        instance = self.get_object()
+        # 获取env_id
+        serializer = self.get_serializer(data=request.data)
+        # 校验通过返回True，不通过则返回报错信息
+        serializer.is_valid(raise_exception=True)
+        env_id = serializer.validated_data.get('env_id')
+        env = Envs.objects.get(id=env_id)
+        # 创建时间戳目录
+        testcase_dir_path = os.path.join(settings.PROJECT_DIR, datetime.strftime(datetime.now(), '%Y%m%d%H%M%S'))
+        os.makedirs(testcase_dir_path)
+        # 获取接口下的所用用例
+        testcase_qs = Testcases.objects.filter(interface__project=instance)
+        if len(testcase_qs) == 0:
+            return Response({'msg': '此项目下没有用例！'})
+        for testcase_obj in testcase_qs:
+            # 创建以项目名命名的目录
+            # 创建以debugtalk.py，yaml文件
+            common.generate_testcase_file(testcase_obj, env, testcase_dir_path)
+        # 运行用例并生成测试报告
+        return common.run(instance, testcase_dir_path)
+
     # 需求:
     # 对names方法进行改造,需要调用list方法,但是需要替换查询集,不需要过滤,分页功能,
     # 且要有与list方法不同的序列化器类进行输出
@@ -163,6 +193,8 @@ class ProjectsViewSet(viewsets.ModelViewSet):
             return ProjectModelSerializers0123
         elif self.action == 'interfaces':
             return ProjectModelSerializers0307
+        elif self.action == 'run':
+            return ProjectsRunSerializer
         else:
             return super().get_serializer_class()
 

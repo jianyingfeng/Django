@@ -37,29 +37,29 @@ def generate_testcase_file(instance: Testcases, env: Envs, testcase_dir_path: st
             file.write(debugtalk_obj.debugtalk)
     interfaces_name = instance.interface.name
     testcase_dir_path = os.path.join(testcase_dir_path, interfaces_name)
-    testcase_list = []
     if not os.path.exists(testcase_dir_path):
         # 在目录A创建以接口名称命名的目录（目录B）
         os.makedirs(testcase_dir_path)
-        # 获取config_id
-        config_id = eval(instance.include).get('config')
-        # 获取base_url
-        base_url = env.base_url if env.base_url else ''
-        # 组装config_dict
-        if config_id:
-            config_obj = Configures.objects.get(id=config_id)
-            config_dict = json.loads(config_obj.request, encoding='utf-8')
-            config_dict['config']['request']['base_url'] = base_url
-        else:
-            config_dict = {
-                'config':
-                {
-                    'name': interfaces_name,
-                    'request': {
-                        'base_url': base_url
-                    }
+    testcase_list = []
+    # 获取config_id
+    config_id = eval(instance.include).get('config')
+    # 获取base_url
+    base_url = env.base_url if env.base_url else ''
+    # 组装config_dict
+    if config_id:
+        config_obj = Configures.objects.get(id=config_id)
+        config_dict = json.loads(config_obj.request, encoding='utf-8')
+        config_dict['config']['request']['base_url'] = base_url
+    else:
+        config_dict = {
+            'config':
+            {
+                'name': interfaces_name,
+                'request': {
+                    'base_url': base_url
                 }
             }
+        }
     testcase_list.append(config_dict)
 
     testcase_id_list = eval(instance.include).get('testcases')
@@ -81,6 +81,7 @@ def generate_testcase_file(instance: Testcases, env: Envs, testcase_dir_path: st
 
 # 运行yaml文件
 def run(instance: Testcases, testcase_dir_path: str):
+    # testcase_dir_path是时间戳目录
     # 创建HttpRunner对象
     hrunner = HttpRunner()
     try:

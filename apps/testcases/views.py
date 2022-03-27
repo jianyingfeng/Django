@@ -1,6 +1,5 @@
 import json
 import os
-import ast
 from datetime import datetime
 
 from django.conf import settings
@@ -134,7 +133,7 @@ class TestcasesViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         # 获取env_id
         serializer = self.get_serializer(data=request.data)
-        # 疑问：这个返回的是什么
+        # 校验通过返回True，不通过则返回报错信息
         serializer.is_valid(raise_exception=True)
         env_id = serializer.validated_data.get('env_id')
         env = Envs.objects.get(id=env_id)

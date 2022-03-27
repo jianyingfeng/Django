@@ -2,6 +2,7 @@ from rest_framework import serializers, filters
 from rest_framework.validators import UniqueValidator
 
 from utils.pagination import PageNumberPagination
+from utils.base_serializers import RunSerializer
 # 导入时前面不能加apps目录，否则会报错（且此时必须将apps目录标记为Resource Root）
 # from apps.debugtalks.models import DebugTalks
 from debugtalks.models import DebugTalks
@@ -48,3 +49,10 @@ class ProjectModelSerializers0307(serializers.ModelSerializer):
     class Meta:
         model = Projects
         fields = ('interfaces',)
+
+
+# 集成公共序列化器类
+class ProjectsRunSerializer(RunSerializer):
+    # 继承内部类的写法
+    class Meta(RunSerializer.Meta):
+        model = Projects
