@@ -98,9 +98,10 @@ def run(instance: Testcases, testcase_dir_path: str):
 
 
 # 生成报告
-def create_report(runner: HttpRunner, instance: Testcases):
+def create_report(runner: HttpRunner, instance):
     """
     创建测试报告
+    instance：是模型对象名（可能是项目、套件、接口或用例）
     """
     report_name = instance.name
 

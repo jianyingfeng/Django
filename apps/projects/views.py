@@ -10,6 +10,7 @@ from django.db.models import Q, Count, Avg, Max, Min
 from django.conf import settings
 
 from utils import common
+from utils.mixins import RunMixin
 from .models import Projects
 from .serializers import ProjectModelSerializers, ProjectModelSerializers0123,\
     ProjectModelSerializers0307, ProjectsRunSerializer
@@ -33,7 +34,7 @@ logger = logging.getLogger('mytest')
 # d、具备APIView的所有功能
 # e、ModelViewSet继承了GenericViewSet，又从上继承了ViewSetMixin，所以具有功能：
 # 在定义url路由条目时，支持给as_view传递字典参数（请求方法名与具体的action方法名
-class ProjectsViewSet(viewsets.ModelViewSet):
+class ProjectsViewSet(RunMixin, viewsets.ModelViewSet):
     # 这里会在接口平台上展示每个请求方法下的注释，冒号是英文冒号
     """
     list:
@@ -130,30 +131,39 @@ class ProjectsViewSet(viewsets.ModelViewSet):
         # res.data.pop('update_time')
         return res
 
-    # 运行项目下所有用例
+    # 运行项目下所有用例方式一
+    # @action(methods=['POST'], detail=True)
+    # def run(self, request, *args, **kwargs):
+    #     # 获取项目模型对象
+    #     instance = self.get_object()
+    #     # 获取env_id
+    #     serializer = self.get_serializer(data=request.data)
+    #     # 校验通过返回True，不通过则返回报错信息
+    #     serializer.is_valid(raise_exception=True)
+    #     env_id = serializer.validated_data.get('env_id')
+    #     env = Envs.objects.get(id=env_id)
+    #     # 创建时间戳目录
+    #     testcase_dir_path = os.path.join(settings.PROJECT_DIR, datetime.strftime(datetime.now(), '%Y%m%d%H%M%S'))
+    #     os.makedirs(testcase_dir_path)
+    #     # 获取项目下的所用用例
+    #     testcase_qs = Testcases.objects.filter(interface__project=instance)
+    #     if len(testcase_qs) == 0:
+    #         return Response({'msg': '此项目下没有用例！'})
+    #     for testcase_obj in testcase_qs:
+    #         # 创建以项目名命名的目录
+    #         # 创建以debugtalk.py，yaml文件
+    #         common.generate_testcase_file(testcase_obj, env, testcase_dir_path)
+    #     # 运行用例并生成测试报告
+    #     return common.run(instance, testcase_dir_path)
+
+    # 运行项目下所有用例优化版
     @action(methods=['POST'], detail=True)
     def run(self, request, *args, **kwargs):
-        # 获取项目模型对象
         instance = self.get_object()
-        # 获取env_id
-        serializer = self.get_serializer(data=request.data)
-        # 校验通过返回True，不通过则返回报错信息
-        serializer.is_valid(raise_exception=True)
-        env_id = serializer.validated_data.get('env_id')
-        env = Envs.objects.get(id=env_id)
-        # 创建时间戳目录
-        testcase_dir_path = os.path.join(settings.PROJECT_DIR, datetime.strftime(datetime.now(), '%Y%m%d%H%M%S'))
-        os.makedirs(testcase_dir_path)
-        # 获取项目下的所用用例
         testcase_qs = Testcases.objects.filter(interface__project=instance)
         if len(testcase_qs) == 0:
             return Response({'msg': '此项目下没有用例！'})
-        for testcase_obj in testcase_qs:
-            # 创建以项目名命名的目录
-            # 创建以debugtalk.py，yaml文件
-            common.generate_testcase_file(testcase_obj, env, testcase_dir_path)
-        # 运行用例并生成测试报告
-        return common.run(instance, testcase_dir_path)
+        return self.execute(instance, testcase_qs, request)
 
     # 需求:
     # 对names方法进行改造,需要调用list方法,但是需要替换查询集,不需要过滤,分页功能,
