@@ -130,6 +130,7 @@ class ProjectsViewSet(viewsets.ModelViewSet):
         # res.data.pop('update_time')
         return res
 
+    # 运行项目下所有用例
     @action(methods=['POST'], detail=True)
     def run(self, request, *args, **kwargs):
         # 获取项目模型对象
@@ -143,7 +144,7 @@ class ProjectsViewSet(viewsets.ModelViewSet):
         # 创建时间戳目录
         testcase_dir_path = os.path.join(settings.PROJECT_DIR, datetime.strftime(datetime.now(), '%Y%m%d%H%M%S'))
         os.makedirs(testcase_dir_path)
-        # 获取接口下的所用用例
+        # 获取项目下的所用用例
         testcase_qs = Testcases.objects.filter(interface__project=instance)
         if len(testcase_qs) == 0:
             return Response({'msg': '此项目下没有用例！'})

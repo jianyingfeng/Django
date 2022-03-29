@@ -1,6 +1,7 @@
 import re, json
 
 from rest_framework import serializers
+from utils.base_serializers import RunSerializer
 from rest_framework.validators import UniqueValidator
 from utils.pagination import PageNumberPagination
 
@@ -10,7 +11,7 @@ from interfaces.models import Interfaces
 
 
 # 获取testsuite列表使用的序列化器类
-class TestsuitesModelSerializer(serializers.ModelSerializer):
+class TestsuiteModelSerializer(serializers.ModelSerializer):
     project = serializers.StringRelatedField(label='所属项目名称', help_text='所属项目名称')
     project_id = serializers.PrimaryKeyRelatedField(label='所属项目id', help_text='所属项目id',
                                                     queryset=Projects.objects.all())
@@ -63,7 +64,6 @@ class TestsuitesModelSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(f'接口id:{item}不存在')
         return include_list_new
 
-
     # 对include字段进行校验
     # 1、先转成列表
     # 2、将接口id装换为整数
@@ -91,3 +91,8 @@ class TestsuitesModelSerializer(serializers.ModelSerializer):
     #         except:
     #             raise serializers.ValidationError(f'接口id:{item}不存在')
     #     return include_list_new
+
+
+class TestsuiteRunSerializer(RunSerializer):
+    class Meta(RunSerializer.Meta):
+        model = Testsuites

@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from .models import Interfaces
 from projects.models import Projects
+from utils.base_serializers import RunSerializer
 
 
 class TestcasesSerializer(serializers.Serializer):
@@ -74,3 +75,8 @@ class ConfiguresSerializer0308(serializers.ModelSerializer):
     class Meta:
         model = Interfaces
         fields = ('configures',)
+
+
+class InterfaceRunSerializer(RunSerializer):
+    class Meta(RunSerializer.Meta):
+        model = Interfaces
