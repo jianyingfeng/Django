@@ -152,6 +152,7 @@ class TestcasesViewSet(RunMixin, viewsets.ModelViewSet):
     @action(methods=['POST'], detail=True)
     def run(self, request, *args, **kwargs):
         instance = self.get_object()
+        # 构造用例查询集
         qs = [instance]
         return self.execute(instance, qs, request)
 

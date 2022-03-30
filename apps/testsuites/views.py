@@ -52,6 +52,7 @@ class TestsuiteViewSet(RunMixin, viewsets.ModelViewSet):
         interfaces_id_list = json.loads(instance.include)
         # 获取接口下的用例
         for interface_id in interfaces_id_list:
+            # 获取用例查询集
             testcase_qs = Testcases.objects.filter(interface_id=interface_id)
             return self.execute(instance, testcase_qs, request)
 

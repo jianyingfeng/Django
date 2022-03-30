@@ -50,7 +50,7 @@ class ProjectsViewSet(RunMixin, viewsets.ModelViewSet):
     # 一个项目一般都是统一的认证方式，无须额外在视图类中指定
     # authentication_classes = []
     # 在视图类中指定权限类，优先级高于全局
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = Projects.objects.all()
     serializer_class = ProjectModelSerializers
     """
@@ -160,6 +160,7 @@ class ProjectsViewSet(RunMixin, viewsets.ModelViewSet):
     @action(methods=['POST'], detail=True)
     def run(self, request, *args, **kwargs):
         instance = self.get_object()
+        # 获取用例查询集
         testcase_qs = Testcases.objects.filter(interface__project=instance)
         if len(testcase_qs) == 0:
             return Response({'msg': '此项目下没有用例！'})

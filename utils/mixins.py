@@ -30,7 +30,8 @@ class NamesMixin:
 
 
 class RunMixin:
-    def execute(self,instance, qs, request):
+    # 运行测试用例的方法
+    def execute(self, instance, qs, request):
         # 获取env_id
         serializer = self.get_serializer(data=request.data)
         # 校验通过返回True，不通过则返回报错信息
@@ -42,6 +43,7 @@ class RunMixin:
         os.makedirs(testcase_dir_path)
         # 创建以项目名命名的目录
         # 创建以debugtalk.py，yaml文件
+        # 对查询集中的用例对象进行循环处理
         for obj in qs:
             common.generate_testcase_file(obj, env, testcase_dir_path)
         # 运行用例并生成测试报告

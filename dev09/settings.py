@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'reports',
     'testsuites',
     'envs',
-    'debugtalks'
+    'debugtalks',
+    'summary'
 ]
 
 MIDDLEWARE = [

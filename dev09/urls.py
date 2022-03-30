@@ -49,6 +49,7 @@ urlpatterns = [
     path('', include('testcases.urls')),
     path('', include('configures.urls')),
     path('', include('user.urls')),
+    path('', include('summary.urls')),
     # 指定测试平台接口文档的url
     path('docs/', include_docs_urls(title='测试平台接口文档', description='xxx接口文档')),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', SchemaView.without_ui(cache_timeout=0), name='schema-json'),  # 导出
