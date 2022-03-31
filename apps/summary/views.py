@@ -18,7 +18,7 @@ class SummaryViewSet(viewsets.GenericViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_summary(self, request, *args, **kwargs):
-        user_boj = User.objects.get(id=request.user.id)
+        user = request.user
         total_count = 0
         success_count = 0
         for obj in Reports.objects.all():
@@ -28,10 +28,10 @@ class SummaryViewSet(viewsets.GenericViewSet):
             {
                 'user':
                     {
-                        'username': user_boj.username,
-                        'role': '管理员' if user_boj.is_staff == 1 else '普通用户',
-                        'date_joined': user_boj.date_joined,
-                        'last_login': user_boj.last_login
+                        'username': user.username,
+                        'role': '管理员' if user.is_staff == 1 else '普通用户',
+                        'date_joined': user.date_joined.strftime('%Y-%m-%d %H:%M:%S') if user.date_joined else '',
+                        'last_login': user.last_login.strftime('%Y-%m-%d %H:%M:%S') if user.last_login else ''
                     },
                 'statistics':
                     {

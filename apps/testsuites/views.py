@@ -51,10 +51,12 @@ class TestsuiteViewSet(RunMixin, viewsets.ModelViewSet):
         # 获取套件包含的接口id
         interfaces_id_list = json.loads(instance.include)
         # 获取接口下的用例
+        testcase_qs_list = []
         for interface_id in interfaces_id_list:
             # 获取用例查询集
             testcase_qs = Testcases.objects.filter(interface_id=interface_id)
-            return self.execute(instance, testcase_qs, request)
+            testcase_qs_list += list(testcase_qs)
+            return self.execute(instance, testcase_qs_list, request)
 
     def get_serializer_class(self):
         if self.action == 'run':

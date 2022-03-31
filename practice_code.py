@@ -1,9 +1,14 @@
 a = [1, 2, 3]
+b = [7, 8]
 
 
-def fun1():
-    for i in a:
-        return i
+# c = a.extend(b)
+c = a + b
+print(c)
 
-
-print(fun1())
+# def fun1():
+#     for i in a:
+#         return i
+#
+#
+# print(fun1())
