@@ -109,8 +109,16 @@ WSGI_APPLICATION = 'dev09.wsgi.application'
 
 DATABASES = {
     'default': {
+        # 指定sqlite3数据库
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        # mysql
+        # 'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': 'mydb',
+        # 'USER': 'root',
+        # 'PASSWORD': '123456',
+        # 'PORT': 3306,
+        # 'HOST': '127.0.0.1'
     }
 }
 
@@ -285,3 +293,8 @@ LOGGING = {
 
 # 运行用例时生成
 PROJECT_DIR = os.path.join(BASE_DIR, 'projects_dir')
+
+# 收集静态文件的路径
+# python manage.py collectstatic
+# 将admin目录删掉
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
