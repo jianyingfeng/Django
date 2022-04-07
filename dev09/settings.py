@@ -30,7 +30,8 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 SECRET_KEY = 'django-insecure-wssq5_!t!(mel9kfmsa4q1n6n0&r%%l_0sd+2r=1o3)=xd6m3f'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
+DEBUG = False
 
 # 指定哪些地址可以访问当前项目
 ALLOWED_HOSTS = ['*']

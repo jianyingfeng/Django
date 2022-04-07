@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 from django.db import connection
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, filters
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db.models import Q, Count, Avg, Max, Min
@@ -53,6 +53,9 @@ class ProjectsViewSet(RunMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Projects.objects.all()
     serializer_class = ProjectModelSerializers
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['=name', '=leader', '=id']
+    ordering_fields = ['name', 'leader', 'id']
     """
     action方法：
     get：list-->获取列表数据
