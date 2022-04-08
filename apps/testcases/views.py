@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 
 from testcases.models import Testcases
-from testcases.serializers import TestcasesSerializer, TestcasesRunSerializer
+from testcases.serializers import TestcaseSerializer, TestcasesRunSerializer
 from envs.models import Envs
 from utils import common
 from utils.mixins import RunMixin
@@ -16,7 +16,7 @@ from utils.mixins import RunMixin
 
 class TestcasesViewSet(RunMixin, viewsets.ModelViewSet):
     queryset = Testcases.objects.all()
-    serializer_class = TestcasesSerializer
+    serializer_class = TestcaseSerializer
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()

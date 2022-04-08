@@ -55,7 +55,7 @@ class I_P_Serializer(serializers.ModelSerializer):
         return attrs
 
 
-class TestcasesSerializer(serializers.ModelSerializer):
+class TestcaseSerializer(serializers.ModelSerializer):
     interface = I_P_Serializer(label='用例所属接口名称，项目名称',
                                help_text='用例所属接口名称，项目名称')
 

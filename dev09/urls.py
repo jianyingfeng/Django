@@ -52,6 +52,7 @@ urlpatterns = [
     path('', include('summary.urls')),
     # 指定测试平台接口文档的url
     path('docs/', include_docs_urls(title='测试平台接口文档', description='xxx接口文档')),
+    # 配置swagger接口文档
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', SchemaView.without_ui(cache_timeout=0), name='schema-json'),  # 导出
     path('swagger/', SchemaView.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),  # redoc美化UI
     path('redoc/', SchemaView.with_ui('redoc', cache_timeout=None), name='schema-redoc'),

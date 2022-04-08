@@ -63,5 +63,5 @@ validate:
 #    取响应结果（字典）中username所跟的列表中的第一个值
 #    - eq: ["json.username.0", 111]
 #运行方式：
-#方式一、hrun + yam文件相对路径 + 其他参数
+#方式一、hrun + yaml文件相对路径 + 其他参数
 #方式二、通过python程序执行

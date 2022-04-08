@@ -30,8 +30,10 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 SECRET_KEY = 'django-insecure-wssq5_!t!(mel9kfmsa4q1n6n0&r%%l_0sd+2r=1o3)=xd6m3f'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = False
+
+# 改为false，不会返回静态资源（会导致接口文档不美观），也不会返回具体的报错信息
+DEBUG = True
+# DEBUG = False
 
 # 指定哪些地址可以访问当前项目
 ALLOWED_HOSTS = ['*']
@@ -199,6 +201,7 @@ REST_FRAMEWORK = {
 
     # 指定使用的认证类
     # a、在全局指定默认的认证类
+    # 当前项目支持session-cookie认证，也支持token认证
     'DEFAULT_AUTHENTICATION_CLASSES': [
         # a、使用jwt token认证
         # 1、在全局路由表中添加obtain_jwt_token路由
@@ -215,7 +218,7 @@ REST_FRAMEWORK = {
     # 'DEFAULT_PERMISSION_CLASSES': [
         # AllowAny不管是否成功认证，都能获取所有权限
         # IsAuthenticated只要登录，就具备所有权限
-        # IsAdminUser管理员具有所有权限
+        # IsAdminUser登录了且只有管理员具有所有权限
         # IsAuthenticatedOrReadOnly，如果登录了就具备所有权限，不登录则为只读权限
         # 'rest_framework.permissions.AllowAny',
     # ],
