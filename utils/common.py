@@ -19,11 +19,15 @@ logger = logging.getLogger('mytest')
 
 # 1、手动建一个projects_dir目录
 # 2、在projects_dir目录下建一个以时间戳命名的目录（时间戳目录）
-# 3、在时间戳目录下建一个以项目名称命名的目录（项目名称目录）（创建前要判断是否已经建过了，）
+# 3、在时间戳目录下建一个以项目名称命名的目录（项目名称目录）（创建前要判断是否已经建过了）
 # 4、在项目名称目录下建debugtalk文件
 # 5、在项目名称目录下建以接口名称命名的目录（接口名称目录）
-# 6、建yaml文件
-# 先组装config部分（需要判断config_id是否存在，分情况组装）
+# 6、组装config部分（需要判断config_id是否存在，分情况组装）、前置用例、和当前用例
+# 7、建yaml文件
+# 8、定义Httprunner对象，直接运行时间戳目录
+# 9、对Httprunner对象.summary属性进行处理
+# 10、使用gen_html_report方法生成报告
+# 11、读取10的html内容，将报告对象存进数据库
 def generate_testcase_file(instance: Testcases, env: Envs, testcase_dir_path: str):
     # 创建以项目名称命名的目录（目录A）
     project_name = instance.interface.project.name
@@ -31,6 +35,7 @@ def generate_testcase_file(instance: Testcases, env: Envs, testcase_dir_path: st
     # 先判断目录A未被创建过
     if not os.path.exists(testcase_dir_path):
         os.makedirs(testcase_dir_path)
+        # project是外键名
         debugtalk_obj = DebugTalks.objects.get(project__name=project_name)
         # 创建debugtalk.py文件，encoding='utf-8'防止中文乱码
         with open(os.path.join(testcase_dir_path, 'debugtalk.py'), 'w', encoding='utf-8') as file:

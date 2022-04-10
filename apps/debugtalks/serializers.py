@@ -16,7 +16,7 @@ class DebugTalksModelSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'project')
 
 
-# 获取列debugtalk单条数据使用的序列化器类
+# 更新，获取详情的序列化器类
 class DebugTalksModelSerializer_One(serializers.ModelSerializer):
     class Meta:
         model = DebugTalks

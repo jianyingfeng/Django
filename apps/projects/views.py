@@ -131,43 +131,42 @@ class ProjectsViewSet(RunMixin, viewsets.ModelViewSet):
         res = super().retrieve(request, *args, **kwargs)
         res.data.pop('id')
         res.data.pop('create_time')
-        # res.data.pop('update_time')
         return res
 
     # 运行项目下所有用例方式一
-    # @action(methods=['POST'], detail=True)
-    # def run(self, request, *args, **kwargs):
-    #     # 获取项目模型对象
-    #     instance = self.get_object()
-    #     # 获取env_id
-    #     serializer = self.get_serializer(data=request.data)
-    #     # 校验通过返回True，不通过则返回报错信息
-    #     serializer.is_valid(raise_exception=True)
-    #     env_id = serializer.validated_data.get('env_id')
-    #     env = Envs.objects.get(id=env_id)
-    #     # 创建时间戳目录
-    #     testcase_dir_path = os.path.join(settings.PROJECT_DIR, datetime.strftime(datetime.now(), '%Y%m%d%H%M%S'))
-    #     os.makedirs(testcase_dir_path)
-    #     # 获取项目下的所用用例
-    #     testcase_qs = Testcases.objects.filter(interface__project=instance)
-    #     if len(testcase_qs) == 0:
-    #         return Response({'msg': '此项目下没有用例！'})
-    #     for testcase_obj in testcase_qs:
-    #         # 创建以项目名命名的目录
-    #         # 创建以debugtalk.py，yaml文件
-    #         common.generate_testcase_file(testcase_obj, env, testcase_dir_path)
-    #     # 运行用例并生成测试报告
-    #     return common.run(instance, testcase_dir_path)
-
-    # 运行项目下所有用例优化版
     @action(methods=['POST'], detail=True)
     def run(self, request, *args, **kwargs):
+        # 获取项目模型对象
         instance = self.get_object()
-        # 获取用例查询集
+        # 获取env_id
+        serializer = self.get_serializer(data=request.data)
+        # 校验通过返回True，不通过则返回报错信息
+        serializer.is_valid(raise_exception=True)
+        env_id = serializer.validated_data.get('env_id')
+        env = Envs.objects.get(id=env_id)
+        # 创建时间戳目录
+        testcase_dir_path = os.path.join(settings.PROJECT_DIR, datetime.strftime(datetime.now(), '%Y%m%d%H%M%S'))
+        os.makedirs(testcase_dir_path)
+        # 获取项目下的所用用例
         testcase_qs = Testcases.objects.filter(interface__project=instance)
         if len(testcase_qs) == 0:
             return Response({'msg': '此项目下没有用例！'})
-        return self.execute(instance, testcase_qs, request)
+        for testcase_obj in testcase_qs:
+            # 创建以项目名命名的目录
+            # 创建以debugtalk.py，yaml文件
+            common.generate_testcase_file(testcase_obj, env, testcase_dir_path)
+        # 运行用例并生成测试报告
+        return common.run(instance, testcase_dir_path)
+
+    # 运行项目下所有用例优化版
+    # @action(methods=['POST'], detail=True)
+    # def run(self, request, *args, **kwargs):
+    #     instance = self.get_object()
+    #     # 获取用例查询集
+    #     testcase_qs = Testcases.objects.filter(interface__project=instance)
+    #     if len(testcase_qs) == 0:
+    #         return Response({'msg': '此项目下没有用例！'})
+    #     return self.execute(instance, testcase_qs, request)
 
     # 需求:
     # 对names方法进行改造,需要调用list方法,但是需要替换查询集,不需要过滤,分页功能,

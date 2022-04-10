@@ -1,4 +1,3 @@
-import re
 import json
 
 from rest_framework import serializers, filters
@@ -9,14 +8,12 @@ from utils.base_serializers import RunSerializer
 
 from testcases.models import Testcases
 from interfaces.models import Interfaces
-from projects.models import Projects
 from configures.models import Configures
 
 
 # 获取项目、接口信息的序列化器类
 class I_P_Serializer(serializers.ModelSerializer):
-    project = serializers.StringRelatedField(label='所属项目名称', help_text='所属项目名称',
-                                             read_only=True)
+    project = serializers.StringRelatedField(label='所属项目名称', help_text='所属项目名称')
     # IsIdExists('project')：调用实例会直接匹配到类中的__call__方法
     # 因为validators列表中只要写方法名，所以IsIdExists('project')不需要加()
     pid = serializers.IntegerField(label='所属项目id', help_text='所属项目id',
@@ -103,7 +100,7 @@ class TestcaseSerializer(serializers.ModelSerializer):
         return result
 
 
-# 集成公共序列化器类
+# 继承公共序列化器类
 class TestcasesRunSerializer(RunSerializer):
     # 继承内部类的写法
     class Meta(RunSerializer.Meta):

@@ -1,8 +1,8 @@
 from decimal import Decimal, ROUND_HALF_UP
 
-from rest_framework import viewsets, permissions
+from rest_framework import permissions
 from rest_framework.response import Response
-from django.contrib.auth.models import User
+from rest_framework.views import APIView
 
 from projects.models import Projects
 from interfaces.models import Interfaces
@@ -14,10 +14,10 @@ from debugtalks.models import DebugTalks
 from reports.models import Reports
 
 
-class SummaryViewSet(viewsets.GenericViewSet):
+class SummaryView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_summary(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         user = request.user
         total_count = 0
         success_count = 0

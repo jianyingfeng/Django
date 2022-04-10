@@ -16,15 +16,15 @@ class ReportViewSet(mixins.RetrieveModelMixin,
     queryset = Reports.objects.all()
     serializer_class = ReportsModelSerializer
 
-    # 重写retrieve方法，
+    # 重写retrieve方法
     # 由于没有调用父类的retrieve方法，所以执行时不会调用序列化器类中的to_representation方法
     def retrieve(self, request, *args, **kwargs):
         instance = super().get_object()
-        reponse = {
+        response = {
             'id': instance.id,
             'summary': json.loads(instance.summary)
         }
-        return Response(reponse)
+        return Response(response)
 
     @action(methods=['GET'], detail=True)
     def download(self, request, *args, **kwargs):

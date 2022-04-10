@@ -29,6 +29,15 @@ class InterfacesSerializer(serializers.ModelSerializer):
     project_id = serializers.PrimaryKeyRelatedField(label='接口所属项目id', help_text='接口所属项目id',
                                                     queryset=Projects.objects.all())
 
+    class Meta:
+        model = Interfaces
+        exclude = ('update_time',)
+        extra_kwargs = {
+            'create_time': {
+                'format': '%Y-%m-%d %H:%M:%S'
+            }
+        }
+
     def to_internal_value(self, data):
         result = super().to_internal_value(data)
         # 方式一：
@@ -44,15 +53,6 @@ class InterfacesSerializer(serializers.ModelSerializer):
     #     validated_data['project_id'] = validated_data['project_id'].id
     #     return super().create(validated_data)
     #     pass
-
-    class Meta:
-        model = Interfaces
-        exclude = ('update_time',)
-        extra_kwargs = {
-            'create_time': {
-                'format': '%Y-%m-%d %H:%M:%S'
-            }
-        }
 
 
 # 给获取单个接口信息使用的序列化器类
